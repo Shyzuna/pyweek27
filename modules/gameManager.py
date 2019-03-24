@@ -18,7 +18,7 @@ class GameManager:
         #mapManager.init()
         #guiManager.init()
         map = Map()
-        map.generate_map((settings.TILE_HEIGHT, settings.TILE_WIDTH))
+        map.generate_map((settings.TILES_NUM_HEIGHT, settings.TILES_NUM_WIDTH))
         self._cases = map.getMap()
 
 
