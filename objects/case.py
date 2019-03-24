@@ -1,19 +1,15 @@
 from settings import settings
+import math
 
 
 class Case(object):
-    def __init__(self, center, diameter):
-        """
-        Init a resource
-        :param position:
-        :param size:
-        :param category:
-        """
-        self._center = center
-        self._diameter = diameter
+    def __init__(self, position):
+        self._position = position
 
-    def __str__(self):
-        return "{} - {} -> {} ({})".format(self._center, self._diameter)
+    def getPosition(self):
+        return self._position
 
-    def getCenter(self):
-        return self._center
+    def draw(self, screen, img):
+        screen.blit(img,
+                    ((settings.TILE_SIDE * 3 / 2 * self.getPosition()[0]),
+                     (settings.TILE_SIDE * math.sqrt(3) * (self.getPosition()[1] + 0.5 * (self.getPosition()[0] & 1)))))

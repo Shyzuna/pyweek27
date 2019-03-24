@@ -1,6 +1,7 @@
 import pygame
 import os
 from modules.displayManager import displayManager
+from settings import settings
 #from modules.mapManager import mapManager
 #from modules.guiManager import guiManager
 from objects.case import Case
@@ -16,9 +17,14 @@ class GameManager:
         #mapManager.init()
         #guiManager.init()
         self._cases = []
-        self._cases.append(Case((100, 100), 50))
-        self._cases.append(Case((150, 100), 50))
-        self._cases.append(Case((100, 150), 50))
+        self._cases.append(Case((0, 0)))
+        self._cases.append(Case((0, 1)))
+        self._cases.append(Case((0, 2)))
+        self._cases.append(Case((0, 3)))
+        self._cases.append(Case((1, 0)))
+        self._cases.append(Case((2, 0)))
+        self._cases.append(Case((3, 0)))
+        self._cases.append(Case((4, 0)))
 
     def start(self):
         clock = pygame.time.Clock()

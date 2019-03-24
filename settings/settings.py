@@ -1,10 +1,11 @@
 import os
+import math
 
 # Generation
 
 # Display
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 400
+SCREEN_HEIGHT = 400
 FPS = 60
 AUTO_SIZE = True
 
@@ -12,8 +13,10 @@ AUTO_SIZE = True
 HEX_PATH = os.path.join('data', 'hex')
 
 # Map parameters
-TILE_WIDTH = 64
-TILE_HEIGHT = 64
+TILE_SIDE = 100
+TILE_WIDTH = TILE_SIDE*2
+TILE_HEIGHT = int(TILE_SIDE*math.sqrt(3))
+
 TILES_NUM_WIDTH = 10
 TILES_NUM_HEIGHT = 10
 
