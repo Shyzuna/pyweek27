@@ -2,6 +2,7 @@ import pygame
 import os
 from settings import settings
 from settings.enums import Colors
+import math
 
 
 class DisplayManager:
@@ -46,8 +47,7 @@ class DisplayManager:
 
         # Display cases
         for case in cases:
-            self.screen.blit(self.imgs["hex"],
-                             (case.getCenter(), case.getCenter()))
+            case.draw(self.screen, self.imgs["hex"])
 
 
 displayManager = DisplayManager()
