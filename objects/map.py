@@ -3,7 +3,7 @@ import numpy
 
 from settings.enums import BiomesTypes
 from settings import biomeSettings
-
+from objects.case import Case
 
 class Map:
     TILES_DIRECTION = [
@@ -14,20 +14,19 @@ class Map:
     ]
 
     def __init__(self):
-        self._map = {}
+        self._map = []
 
     def generate_map(self, mapSize):
         totalTiles = mapSize[0] * mapSize[1]
         tilesRepartition = {}
-        undefinedTiles = []
+        tempMap = {}
 
         # Init map
         print("Taille totale %s" % totalTiles)
         for i in range(0, mapSize[0]):
-            self._map.update({i: {}})
+            tempMap.update({i: {}})
             for j in range(0, mapSize[1]):
-                self._map[i].update({j: -1})
-                undefinedTiles.append((i, j))
+                tempMap[i].update({j: -1})
 
         # Compute tiles repartition
         for biome in BiomesTypes:
@@ -39,7 +38,7 @@ class Map:
             print("Repartition de %s nombre de tuiles %s avec delta %s" % (biome, int(tilesNum), delta))
 
         # Fill map
-        for row_index, row in self._map.items():
+        for row_index, row in tempMap.items():
             for col_index, col in row.items():
                 if col == -1:
                     print("Case %s %s non traitée" % (row_index, col_index))
@@ -52,7 +51,7 @@ class Map:
 
                     print("Taille du batch %s de type %s" % (batchSize, biome))
 
-                    self._map[row_index][col_index] = biome
+                    tempMap[row_index][col_index] = biome
                     batchElements = [(row_index, col_index)]
                     batchSize -= 1
 
@@ -74,8 +73,8 @@ class Map:
                                 and next_tile_col >= 0 and next_tile_col < mapSize[1]:
                                 break
 
-                        if self._map[next_tile_row][next_tile_col] == -1:
-                            self._map[next_tile_row][next_tile_col] = biome
+                        if tempMap[next_tile_row][next_tile_col] == -1:
+                            tempMap[next_tile_row][next_tile_col] = biome
                             batchSize -= 1
                             tilesRepartition[biome] -= -1
                             numRetries = 40
@@ -86,15 +85,17 @@ class Map:
         print(tilesRepartition)
 
         out = ""
-        for row_index, row in self._map.items():
+        for row_index, row in tempMap.items():
             out += '\n'
             for col_index, col in row.items():
                 out += str(col) + " "
+                self._map.append(Case((row_index, col_index)))
 
         print(out)
 
     def getMap(self):
         return self._map
+
 
 map = Map()
 map.generate_map((10, 10))

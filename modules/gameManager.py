@@ -1,6 +1,7 @@
 import pygame
 import os
 from modules.displayManager import displayManager
+from objects.map import Map
 from settings import settings
 #from modules.mapManager import mapManager
 #from modules.guiManager import guiManager
@@ -16,15 +17,10 @@ class GameManager:
         displayManager.init()
         #mapManager.init()
         #guiManager.init()
-        self._cases = []
-        self._cases.append(Case((0, 0)))
-        self._cases.append(Case((0, 1)))
-        self._cases.append(Case((0, 2)))
-        self._cases.append(Case((0, 3)))
-        self._cases.append(Case((1, 0)))
-        self._cases.append(Case((2, 0)))
-        self._cases.append(Case((3, 0)))
-        self._cases.append(Case((4, 0)))
+        map = Map()
+        map.generate_map((settings.TILE_HEIGHT, settings.TILE_WIDTH))
+        self._cases = map.getMap()
+
 
     def start(self):
         clock = pygame.time.Clock()
