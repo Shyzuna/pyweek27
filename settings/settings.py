@@ -1,0 +1,6 @@
+
+# Map settings
+MAP_HEIGHT = 10
+MAP_WIDTH = 10
+MAP_START_EXIT_MIN_DISTANCE = 8
+
