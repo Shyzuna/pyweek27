@@ -2,7 +2,6 @@ import pygame
 import os
 from settings import settings
 from settings.enums import Colors
-import math
 
 
 class DisplayManager:
@@ -23,7 +22,7 @@ class DisplayManager:
         settings.SCROLL_MOUSE_MAX_Y = settings.SCREEN_HEIGHT - settings.SCROLL_MOUSE_MARGIN
         self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT),
                                               self.flags)
-        pygame.display.set_caption("")
+        pygame.display.set_caption("666")
 
         self.createBaseMapSurface()
         self.loadImgs()

@@ -3,7 +3,7 @@ import os
 from modules.displayManager import displayManager
 from settings import settings
 #from modules.mapManager import mapManager
-#from modules.guiManager import guiManager
+from modules.guiManager import guiManager
 from objects.case import Case
 
 
@@ -15,7 +15,7 @@ class GameManager:
     def init(self):
         displayManager.init()
         #mapManager.init()
-        #guiManager.init()
+        guiManager.init()
         self._cases = []
         self._cases.append(Case((0, 0)))
         self._cases.append(Case((0, 1)))
@@ -34,6 +34,8 @@ class GameManager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loop = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    guiManager.checkMousePosition(pygame.mouse.get_pos())
 
             # Update
             # guiManager.updateGui()
@@ -43,7 +45,17 @@ class GameManager:
             # guiManager.displayGui()
             pygame.display.flip()
 
-            clock.tick(20)
+            clock.tick(settings.FPS)
+
+    def getCases(self):
+        return self._cases
+
+    def getCaseAt(self, point):
+        for case in self.getCases():
+            if case.checkHover(point):
+                return case
+        # Not found
+        return None
 
 
 gameManager = GameManager()
