@@ -24,9 +24,9 @@ class Map:
 
         # Init map
         print("Taille totale %s" % totalTiles)
-        for i in range(0, mapSize[0]):
+        for i in range(1, mapSize[0] + 1):
             tempMap.update({i: {}})
-            for j in range(0, mapSize[1]):
+            for j in range(1, mapSize[1] + 1):
                 tempMap[i].update({j: -1})
                 tilesLeft.append((i, j))
 
@@ -86,8 +86,8 @@ class Map:
                             next_tile_row = batchElements[neighbor][0] + next_pos[0]
                             next_tile_col = batchElements[neighbor][1] + next_pos[1]
 
-                            if next_tile_row >= 0 and next_tile_row < mapSize[0] \
-                                and next_tile_col >= 0 and next_tile_col < mapSize[1]:
+                            if next_tile_row >= 1 and next_tile_row <= mapSize[0] \
+                                and next_tile_col >= 1 and next_tile_col <= mapSize[1]:
                                 break
 
                         if tempMap[next_tile_row][next_tile_col] == -1:

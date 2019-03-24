@@ -36,7 +36,7 @@ class DisplayManager:
             try:
                 img = pygame.image.load(os.path.join(settings.HEX_PATH, str(biome.value) + ".png"))
                 self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
-            except Exeception as e:
+            except Exception as e:
                 print(e)
                 pass
 
