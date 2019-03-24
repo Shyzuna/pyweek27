@@ -12,7 +12,7 @@ from settings.enums import BiomesTypes
 
 BIOMES_SETTINGS = {
     BiomesTypes.FOREST: {
-        'repartition': 0.25,
+        'repartition': 0.15,
         'repartition_delta': 0.05,
         'size_range': [2, 5]
     },
@@ -27,7 +27,7 @@ BIOMES_SETTINGS = {
         'size_range': [2, 5]
     },
     BiomesTypes.PLAIN: {
-        'repartition': 0.25,
+        'repartition': 0.35,
         'repartition_delta': 0.05,
         'size_range': [2, 5]
     }

@@ -20,6 +20,7 @@ class Map:
         totalTiles = mapSize[0] * mapSize[1]
         tilesRepartition = {}
         tempMap = {}
+        tilesLeft = []
 
         # Init map
         print("Taille totale %s" % totalTiles)
@@ -27,24 +28,38 @@ class Map:
             tempMap.update({i: {}})
             for j in range(0, mapSize[1]):
                 tempMap[i].update({j: -1})
+                tilesLeft.append((i, j))
 
         # Compute tiles repartition
+        randomTotalTiles = 0
         for biome in BiomesTypes:
             delta = numpy.random.uniform(-biomeSettings.BIOMES_SETTINGS[biome]['repartition_delta'],
                                          biomeSettings.BIOMES_SETTINGS[biome]['repartition_delta'])
-            tilesNum = totalTiles * (biomeSettings.BIOMES_SETTINGS[biome]['repartition'] - delta)
-            tilesRepartition.update({biome: int(tilesNum)})
+            tilesNum = int(totalTiles * (biomeSettings.BIOMES_SETTINGS[biome]['repartition'] - delta))
+            tilesRepartition.update({biome: tilesNum})
+            randomTotalTiles += tilesNum
 
-            print("Repartition de %s nombre de tuiles %s avec delta %s" % (biome, int(tilesNum), delta))
+        if randomTotalTiles < totalTiles:
+            randLastTye = numpy.random.randint(0, len(BiomesTypes))
+            tilesRepartition[BiomesTypes(randLastTye)] += totalTiles - randomTotalTiles
+
+        print(tilesRepartition)
 
         # Fill map
-        for row_index, row in tempMap.items():
-            for col_index, col in row.items():
-                if col == -1:
+        while len(tilesLeft) > 0:
+            for tile in tilesLeft:
+                row_index = tile[0]
+                col_index = tile[1]
+                if tempMap[row_index][col_index] == -1:
                     print("Case %s %s non traitée" % (row_index, col_index))
                     biome = BiomesTypes(numpy.random.randint(0, len(BiomesTypes)))
                     batchSize = numpy.random.randint(biomeSettings.BIOMES_SETTINGS[biome]['size_range'][0],
                                                      biomeSettings.BIOMES_SETTINGS[biome]['size_range'][1] + 1)
+
+                    while tilesRepartition[biome] == 0:
+                        biome = BiomesTypes(numpy.random.randint(0, len(BiomesTypes)))
+                        batchSize = numpy.random.randint(biomeSettings.BIOMES_SETTINGS[biome]['size_range'][0],
+                                                         biomeSettings.BIOMES_SETTINGS[biome]['size_range'][1] + 1)
 
                     if batchSize > tilesRepartition[biome]:
                         batchSize = tilesRepartition[biome]
@@ -54,6 +69,8 @@ class Map:
                     tempMap[row_index][col_index] = biome
                     batchElements = [(row_index, col_index)]
                     batchSize -= 1
+                    tilesRepartition[biome] -= 1
+                    tilesLeft.remove((row_index, col_index))
 
                     # Chose neighbor
                     numRetries = 40
@@ -74,11 +91,13 @@ class Map:
                                 break
 
                         if tempMap[next_tile_row][next_tile_col] == -1:
+                            print("Nouveau voisin %s %s" % (next_tile_row, next_tile_col))
                             tempMap[next_tile_row][next_tile_col] = biome
                             batchSize -= 1
-                            tilesRepartition[biome] -= -1
+                            tilesRepartition[biome] -= 1
                             numRetries = 40
                             batchElements.append((next_tile_row, next_tile_col))
+                            tilesLeft.remove((next_tile_row, next_tile_col))
                         else:
                             numRetries -= 1
 
@@ -89,7 +108,7 @@ class Map:
             out += '\n'
             for col_index, col in row.items():
                 out += str(col) + " "
-                self._map.append(Case((row_index, col_index)))
+                self._map.append(Case((row_index, col_index), col))
 
         print(out)
 

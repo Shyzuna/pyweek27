@@ -1,7 +1,7 @@
 import pygame
 import os
 from settings import settings
-from settings.enums import Colors
+from settings.enums import Colors, BiomesTypes
 import math
 
 
@@ -32,8 +32,13 @@ class DisplayManager:
         self.imgs = {}
 
         # Load hex images
-        img = pygame.image.load(os.path.join(settings.HEX_PATH, "hexagon.png"))
-        self.imgs["hex"] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
+        for biome in BiomesTypes:
+            try:
+                img = pygame.image.load(os.path.join(settings.HEX_PATH, str(biome.value) + ".png"))
+                self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
+            except Exeception as e:
+                print(e)
+                pass
 
     def createBaseMapSurface(self):
         self.baseMapSurface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
@@ -47,7 +52,7 @@ class DisplayManager:
 
         # Display cases
         for case in cases:
-            case.draw(self.screen, self.imgs["hex"])
+            case.draw(self.screen, self.imgs[case.getType().value])
 
 
 displayManager = DisplayManager()

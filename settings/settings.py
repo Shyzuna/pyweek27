@@ -13,7 +13,7 @@ AUTO_SIZE = True
 HEX_PATH = os.path.join('data', 'hex')
 
 # Map parameters
-TILE_SIDE = 100
+TILE_SIDE = 50
 TILE_WIDTH = TILE_SIDE*2
 TILE_HEIGHT = int(TILE_SIDE*math.sqrt(3))
 TILES_NUM_WIDTH = 10
