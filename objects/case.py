@@ -7,6 +7,7 @@ import math
 
 
 class Case(object):
+
     def __init__(self, position, type):
         self._position = position
         self._type = type
@@ -16,6 +17,9 @@ class Case(object):
 
     def getType(self):
         return self._type
+
+    def setType(self, type):
+        self._type = type
 
     def draw(self, screen, img):
         # Offset entre le centre et le top left corner du sprite
@@ -35,4 +39,8 @@ class Case(object):
         print("Coordonnees trouvees: ({},{}) pour le clic a ({},{})".format(col, row, point[0], point[1]))
 
         return (col, row) == self.getPosition()
+
+
+
+
 

@@ -2,6 +2,7 @@ import os
 import math
 
 # Generation
+MAP_MIN_DIST_PLAYER_EXIT = 7
 
 # Display
 SCREEN_WIDTH = 1024
