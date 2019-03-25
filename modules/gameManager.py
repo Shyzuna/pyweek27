@@ -38,7 +38,7 @@ class GameManager:
 
             # Display
             displayManager.display(self._cases)
-            # guiManager.displayGui()
+            guiManager.displayGui(displayManager.screen)
             pygame.display.flip()
 
             clock.tick(settings.FPS)

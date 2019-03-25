@@ -55,4 +55,6 @@ class DisplayManager:
             case.draw(self.screen, self.imgs[case.getType().value])
 
 
+
+
 displayManager = DisplayManager()

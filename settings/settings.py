@@ -11,6 +11,7 @@ AUTO_SIZE = True
 
 # Paths
 HEX_PATH = os.path.join('data', 'hex')
+FONT_PATH = os.path.join('data', 'fonts')
 
 # Map parameters
 TILE_SIDE = 50
