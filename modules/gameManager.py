@@ -38,14 +38,20 @@ class GameManager:
         loop = True
 
         while loop:
+
+            guiManager.updateMousePos(pygame.mouse.get_pos())
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loop = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     guiManager.checkMousePosition(pygame.mouse.get_pos())
+                    guiManager.checkOnClick(True)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    guiManager.checkOnClick(False)
 
             # Update
-            # guiManager.updateGui()
+            guiManager.updateGui()
 
             # Display
             displayManager.display(self._cases)
