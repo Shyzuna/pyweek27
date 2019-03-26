@@ -52,16 +52,17 @@ class GuiManager(object):
 
     def checkMousePosition(self, pixel):
         # Check cases
-        case = modules.gameManager.gameManager.getCaseAtPixel(pixel)
+        map = modules.gameManager.gameManager.getMap()
+        case = map.getCaseAtPixel(pixel)
 
         if case is None:
             print("Le curseur n'est pas sur une case")
             return None
 
         # Test getNeighbours
-        neighbours = modules.gameManager.gameManager.getCaseNeighbours(case)
+        neighbours = map.getCaseNeighbours(case)
         # Test getSpiralRing
-        ring = modules.gameManager.gameManager.getCaseSpiralRing(case, 2)
+        ring = map.getCaseSpiralRing(case, 2)
 
         # Change neighbours type
         type = random.choice(list(BiomesTypes))

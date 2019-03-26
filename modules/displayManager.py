@@ -44,14 +44,14 @@ class DisplayManager:
         self.baseMapSurface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.baseMapSurface.fill(Colors.BLUE_OCEAN.value)
 
-    def display(self, cases):
+    def display(self, map):
         self.screen.fill(Colors.WHITE.value)
 
         # Display background
         self.screen.blit(self.baseMapSurface, (0, 0))
 
         # Display cases
-        for case in cases:
+        for case in map.getCases():
             case.draw(self.screen, self.imgs[case.getType().value])
 
 
