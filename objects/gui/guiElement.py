@@ -1,5 +1,8 @@
 import pygame
 
+# Put hover state here !
+# try to do some handler biding
+
 class GuiElement(object):
     def __init__(self, position=(0, 0), size=(0, 0), parent=None,
                  flatPos=False, flatSize=False, windowBased=False, debug=False):
@@ -101,7 +104,7 @@ class GuiElement(object):
         wasInside = self._insideElement
         self._insideElement = False
         currentElem = None
-        if self._flatRect.collidepoint(mousePos):
+        if self._show and self._flatRect.collidepoint(mousePos):
             currentElem = self
             for child in self._children:
                 result = child.checkInside(mousePos)

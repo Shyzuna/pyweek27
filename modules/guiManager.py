@@ -21,6 +21,7 @@ class GuiManager(object):
         self._testBtn = None
         self._box = None
         self._text = None
+        self._button = None
 
     def init(self):
         pygame.font.init()
@@ -29,12 +30,16 @@ class GuiManager(object):
         self._text = BasicLabel(font=self._fonts['default'], color=Colors.WHITE.value, text='Hello', parent=self._box,
                                 position=(0.05, 0.05), size=(0.3, 0.3), vAlign=VTextAlignEnum.CENTER,
                                 hAlign=HTextAlignEnum.CENTER)
+        self._box.toggleShow()
         self._text.toggleDebug()
         self._testBtn = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 255, 128),
                                     selectedColor=(0, 255, 0), textColor=Colors.BLACK.value, text='Click to Hide',
                                     parent=self._box, position=(0.5, 0.8), size=(0.1, 0.1),
                                     clickHandler=self._box.toggleShow)
         self._testBtn.toggleDebug()
+        self._button = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 255, 128),
+                                    selectedColor=(0, 255, 0), textColor=Colors.BLACK.value, text='Click to Show',
+                                    position=(0.8, 0.1), size=(0.1, 0.1), clickHandler=self._box.toggleShow, windowBased=True)
 
     def checkMousePosition(self, pixel):
         # Check cases
@@ -59,14 +64,23 @@ class GuiManager(object):
             self._onGuiElement.onClick(value)
 
     def updateMousePos(self, mousePos):
+        # small bug here showing new element without moving
         if self._lastMousePos != mousePos:
             self._lastMousePos = mousePos
+            # will use layer here
+            self._onGuiElement = None
             self._onGuiElement = self._box.checkInside(mousePos)
+            if self._onGuiElement is None:
+                self._onGuiElement = self._button.checkInside(mousePos)
 
     def updateGui(self):
+        # will use layer here
+        self._button.update()
         self._box.update()
 
     def displayGui(self, screen):
+        # will use layer here
+        self._button.display(screen)
         self._box.display(screen)
 
 
