@@ -5,6 +5,7 @@ def hexRound(q, r):
 
     return nq, nr
 
+
 def cubeRound(x, y, z):
     rx = round(x)
     ry = round(y)
@@ -37,6 +38,7 @@ def axialToCube(q, r):
     y = -x-z
 
     return x, y, z
+
 
 def cubeToOddQ(x, y, z):
     col = x

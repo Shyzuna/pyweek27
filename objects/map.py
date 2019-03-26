@@ -108,7 +108,7 @@ class Map:
             out += '\n'
             for col_index, col in row.items():
                 out += str(col) + " "
-                self._map.append(Case((row_index, col_index), col))
+                self._map.append(Case(col, (row_index, col_index)))
 
         print(out)
 

@@ -6,7 +6,16 @@ from settings import settings
 #from modules.mapManager import mapManager
 from modules.guiManager import guiManager
 from objects.case import Case
+from objects.hex import Hex
 
+axial_directions = [
+    # Pour les colonnes paires
+    [Hex(0, -1), Hex(+1, -1), Hex(+1, 0),
+     Hex(0, +1), Hex(-1, 0), Hex(-1, -1)],
+    # Pour les colonnes impaires
+    [Hex(0, -1), Hex(+1, 0), Hex(+1, +1),
+     Hex(-1, +1), Hex(0, +1), Hex(-1, 0)]
+]
 
 class GameManager:
 
@@ -46,12 +55,30 @@ class GameManager:
     def getCases(self):
         return self._cases
 
-    def getCaseAt(self, point):
+    def getCaseAtPos(self, pos):
+        for case in self.getCases():
+            if case.getPosition() == pos:
+                return case
+        # Not found
+        return None
+
+    def getCaseAtPixel(self, point):
         for case in self.getCases():
             if case.checkHover(point):
                 return case
         # Not found
         return None
 
+    def getCaseNeighbours(self, case):
+        neighbours = []
+        # On choisit les bonnes directions en fonction de la parité sur la colonne
+        directions = axial_directions[case.getHex().getQ() & 1]
+
+        for direction in directions:
+            for _case in self.getCases():
+                if (case.getHex() + direction).getPosition() == _case.getPosition():
+                    neighbours.append(_case)
+
+        return neighbours
 
 gameManager = GameManager()
