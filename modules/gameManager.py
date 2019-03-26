@@ -7,8 +7,9 @@ from settings import settings
 from modules.guiManager import guiManager
 from objects.case import Case
 from objects.hex import Hex
+from modules import utils
 
-axial_directions = [
+oddq_directions = [
     # Pour les colonnes paires
     [Hex(0, -1), Hex(+1, -1), Hex(+1, 0),
      Hex(0, +1), Hex(-1, 0), Hex(-1, -1)],
@@ -73,7 +74,7 @@ class GameManager:
     def getCaseNeighbours(self, case):
         neighbours = []
         # On choisit les bonnes directions en fonction de la parité sur la colonne
-        directions = axial_directions[case.getHex().getQ() & 1]
+        directions = oddq_directions[case.getHex().getQ() & 1]
 
         for direction in directions:
             for _case in self.getCases():
@@ -81,5 +82,31 @@ class GameManager:
                     neighbours.append(_case)
 
         return neighbours
+
+    def getCaseRing(self, case, radius):
+        x, y, z = utils.oddQToCube(case.getHex().getQ(), case.getHex().getR())
+        cubeResults = utils.cubeRing(x, y, z, radius)
+        results = []
+        for cubeResult in cubeResults:
+            x, y, z = cubeResult
+            for case in self.getCases():
+                if utils.cubeToOddQ(x, y, z) == case.getPosition():
+                    results.append(case)
+
+        return results
+
+    def getCaseSpiralRing(self, case, radius):
+        x, y, z = utils.oddQToCube(case.getHex().getQ(), case.getHex().getR())
+        cubeResults = utils.cubeSpiral(x, y, z, radius)
+        results = []
+
+        for cubeResult in cubeResults:
+            x, y, z = cubeResult
+            for case in self.getCases():
+                if utils.cubeToOddQ(x, y, z) == case.getPosition():
+                    results.append(case)
+
+        return results
+
 
 gameManager = GameManager()

@@ -30,10 +30,13 @@ class GuiManager(object):
 
         # Test getNeighbours
         neighbours = modules.gameManager.gameManager.getCaseNeighbours(case)
+        # Test getSpiralRing
+        ring = modules.gameManager.gameManager.getCaseSpiralRing(case, 2)
+
         # Change neighbours type
         type = random.choice(list(BiomesTypes))
-        for neighbour in neighbours:
-            neighbour._type = type
+        for _case in ring:
+            _case._type = type
 
 
 
