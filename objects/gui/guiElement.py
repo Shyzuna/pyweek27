@@ -112,6 +112,7 @@ class GuiElement(object):
             if currentElem == self:
                 self._insideElement = True
         if wasInside and wasInside != self._insideElement:
+            # Layer system will make this buggy when dragging moose from top layer to down layer
             self._clickIn = False
         return currentElem
 
