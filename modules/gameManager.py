@@ -26,8 +26,9 @@ class GameManager:
         displayManager.init()
         #mapManager.init()
         guiManager.init()
-        map = Map()
-        map.generate_map((settings.TILES_NUM_HEIGHT, settings.TILES_NUM_WIDTH))
+        map = Map((settings.TILES_NUM_HEIGHT, settings.TILES_NUM_WIDTH))
+        map.generate()
+        print(map.findAPath((1,1), (6,6)))
         self._cases = map.getMap()
 
 

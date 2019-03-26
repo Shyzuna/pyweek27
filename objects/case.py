@@ -9,7 +9,7 @@ import math
 class Case(object):
     # Le repère de _position est axial (les deux axes sont q et r)
     # q est colinéaire à l'axe des abscisses
-    # r est tourné de 30° dans le sens horaire
+    # r est tourné de 60° dans le sens horaire
     def __init__(self, type, position=None, hex=None):
 
         if position is not None:
@@ -27,6 +27,9 @@ class Case(object):
 
     def getType(self):
         return self._type
+
+    def setType(self, type):
+        self._type = type
 
     def draw(self, screen, img):
         # Offset entre le centre et le top left corner du sprite
