@@ -1,3 +1,4 @@
+
 cubeDirections = [
     (+1, -1, 0), (+1, 0, -1), (0, +1, -1),
     (-1, +1, 0), (-1, 0, +1), (0, -1, +1)
@@ -89,8 +90,15 @@ def axialToCube(q, r):
 
     return x, y, z
 
+
 def oddQToCube(q, r):
     x = q
     z = r - (q - (q & 1)) / 2
     y = -x-z
     return x, y, z
+
+
+def heuristic(a, b):
+    (x1, y1) = a
+    (x2, y2) = b
+    return abs(x1 - x2) + abs(y1 - y2)

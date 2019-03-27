@@ -40,3 +40,4 @@ class Hex(object):
     # Soustrait le vecteur de position du paramètre hex à cette hex
     def __sub__(self, hex):
         return Hex(self.getQ() - hex.getQ(), self.getR() - hex.getR())
+

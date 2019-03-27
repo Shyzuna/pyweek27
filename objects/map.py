@@ -5,6 +5,8 @@ from settings.enums import BiomesTypes
 from settings import biomeSettings
 from objects.case import Case
 from objects.hex import Hex
+from objects.node import Node
+from objects.priorityQueue import PriorityQueue
 from modules import utils
 
 oddq_directions = [
@@ -85,16 +87,7 @@ class Map:
         return None
 
     def getCaseNeighbours(self, case):
-        neighbours = []
-        # On choisit les bonnes directions en fonction de la parité sur la colonne
-        directions = oddq_directions[case.getHex().getQ() & 1]
-
-        for direction in directions:
-            for _case in self.getCases():
-                if (case.getHex() + direction).getPosition() == _case.getPosition():
-                    neighbours.append(_case)
-
-        return neighbours
+        return self.getCaseRing(case, 1)
 
     def getCaseRing(self, case, radius):
         x, y, z = utils.oddQToCube(case.getHex().getQ(), case.getHex().getR())
@@ -120,6 +113,105 @@ class Map:
                     results.append(case)
 
         return results
+
+    # Renvoie la série de cases constituant le chemin
+    # le plus court entre start et end (les deux cases
+    # sont incluses dans le chemin)
+    # *doit* contourner les montagnes.
+    def getShortestPath(self, start, end):
+        """Returns a list of tuples as a path from the given start to the given end in the given maze"""
+
+        # Impossible de compute si les cases de départ ou de fin sont infranchissables
+        if self.getCaseAtPos(start).getType() == BiomesTypes.MOUNTAIN or\
+                self.getCaseAtPos(end).getType() == BiomesTypes.MOUNTAIN:
+            return []
+
+        # Create start and end node
+        start_node = Node(None, start)
+        start_node.g = start_node.h = start_node.f = 0
+        end_node = Node(None, end)
+        end_node.g = end_node.h = end_node.f = 0
+
+        # Initialize both open and closed list
+        open_list = []
+        closed_list = []
+
+        # Add the start node
+        open_list.append(start_node)
+
+        # Loop until you find the end
+        while len(open_list) > 0:
+
+            # Get the current node
+            current_node = open_list[0]
+            current_index = 0
+            for index, item in enumerate(open_list):
+                if item.f < current_node.f:
+                    current_node = item
+                    current_index = index
+
+            # Pop current off open list, add to closed list
+            open_list.pop(current_index)
+            closed_list.append(current_node)
+
+            # Found the goal
+            if current_node == end_node:
+                path = []
+                current = current_node
+                while current is not None:
+                    path.append(self.getCaseAtPos(current.position))
+                    current = current.parent
+                return path[::-1]  # Return reversed path
+
+            # Generate children
+            children = []
+            if current_node.position[0] % 2 > 0:
+                new_hexs = oddq_directions[1]
+            else:
+                new_hexs = oddq_directions[0]
+
+            for new_hex in new_hexs:  # Adjacent hexs
+
+                # Get node position
+                new_position = new_hex.getPosition()
+                node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+
+                # Make sure within range
+                if not self.inMap(node_position):
+                    continue
+
+                # Make sure walkable terrain
+                new_case = self.getCaseAtPos(node_position)
+                if new_case.getType() == BiomesTypes.MOUNTAIN:
+                    continue
+
+                # Create new node
+                new_node = Node(current_node, node_position)
+
+                # Append
+                children.append(new_node)
+
+            # Loop through children
+            for child in children:
+
+                # Child is on the closed list
+                for closed_child in closed_list:
+                    if child == closed_child:
+                        continue
+
+                # Create the f, g, and h values
+                child.g = current_node.g + 1
+                child.h = ((child.position[0] - end_node.position[0]) ** 2) + (
+                            (child.position[1] - end_node.position[1]) ** 2)
+                child.f = child.g + child.h
+
+                # Child is already in the open list
+                for open_node in open_list:
+                    if child == open_node and child.g > open_node.g:
+                        continue
+
+                # Add the child to the open list
+                open_list.append(child)
 
     def _generatePlayerAndExit(self):
         print("Not implmented")
