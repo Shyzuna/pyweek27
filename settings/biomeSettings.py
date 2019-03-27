@@ -14,21 +14,25 @@ BIOMES_SETTINGS = {
     BiomesTypes.FOREST: {
         'repartition': 0.15,
         'repartition_delta': 0.05,
-        'size_range': [2, 5]
+        'size_range': [2, 5],
+        'is_walkable': True
     },
     BiomesTypes.DESERT: {
         'repartition': 0.25,
         'repartition_delta': 0.05,
-        'size_range': [2, 5]
+        'size_range': [2, 5],
+        'is_walkable': True
     },
     BiomesTypes.MOUNTAIN: {
         'repartition': 0.25,
         'repartition_delta': 0.05,
-        'size_range': [2, 5]
+        'size_range': [2, 5],
+        'is_walkable': False
     },
     BiomesTypes.PLAIN: {
         'repartition': 0.35,
         'repartition_delta': 0.05,
-        'size_range': [2, 5]
+        'size_range': [2, 5],
+        'is_walkable': True
     }
 }

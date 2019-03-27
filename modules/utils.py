@@ -1,4 +1,3 @@
-
 cubeDirections = [
     (+1, -1, 0), (+1, 0, -1), (0, +1, -1),
     (-1, +1, 0), (-1, 0, +1), (0, -1, +1)
@@ -102,3 +101,26 @@ def heuristic(a, b):
     (x1, y1) = a
     (x2, y2) = b
     return abs(x1 - x2) + abs(y1 - y2)
+
+
+def cubeDistance(x1, y1, z1, x2, y2, z2):
+    return max(abs(x1-x2), abs(y1-y2), abs(z1-z2))
+
+
+def lerp(a, b, t):
+    return a + (b - a)*t
+
+
+def cubeLerp(x1, y1, z1, x2, y2, z2, t):
+    return lerp(x1, x2, t), lerp(y1, y2, t), lerp(z1, z2, t)
+
+
+def cubeLineDraw(x1, y1, z1, x2, y2, z2):
+    dist = cubeDistance(x1, y1, z1, x2, y2, z2)
+    results = []
+
+    for i in range(int(dist) + 1):
+        x, y, z = cubeLerp(x1, y1, z1, x2, y2, z2, i/dist)
+        results.append(cubeRound(x, y, z))
+
+    return results

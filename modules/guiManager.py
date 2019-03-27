@@ -62,17 +62,17 @@ class GuiManager(object):
         #neighbours = map.getCaseNeighbours(case)
         # Test getSpiralRing
         #ring = map.getCaseSpiralRing(case, 2)
+        # Test getShortestPath
+        # path = map.getShortestPath(case.getPosition(), map.getCaseAtPos((2, 2)).getPosition())
+        # Test getVisibleCases
+        visible_cases = map.getVisibleCases(case, 3)
 
         # Change neighbours type
-        #type = random.choice(list(BiomesTypes))
-        #for _case in ring:
-        #    _case._type = type
-
-        path = map.getShortestPath(case.getPosition(), map.getCaseAtPos((2, 2)).getPosition())
-        # Change neighbours type
-        type = random.choice(list(BiomesTypes))
-        for _case in path:
-           _case._type = type
+        # if a path has been found
+        if visible_cases is not None:
+            type = random.choice([BiomesTypes.PLAIN, BiomesTypes.FOREST, BiomesTypes.DESERT])
+            for _case in visible_cases:
+               _case._type = type
 
     def checkOnClick(self, value):
         if self._onGuiElement is not None:

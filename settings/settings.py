@@ -2,7 +2,9 @@ import os
 import math
 
 # Generation
-MAP_MIN_DIST_PLAYER_EXIT = 7
+MAP_MIN_DIST_PLAYER_EXIT = 10
+MONSTERS_NUM = 10
+MIN_DIST_PLAYER_MONSTERS = 3
 
 # Display
 SCREEN_WIDTH = 1024

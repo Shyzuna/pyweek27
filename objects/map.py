@@ -3,6 +3,7 @@ import numpy
 
 from settings.enums import BiomesTypes
 from settings import biomeSettings
+from settings import settings
 from objects.case import Case
 from objects.hex import Hex
 from objects.node import Node
@@ -22,18 +23,24 @@ class Map:
 
     def __init__(self, size):
         self._cases = []
+        self._dictMap = {}
         self._height = size[0]
         self._width = size[1]
+        self._player = None
+        self._exit = None
+        self._monsters = []
 
     def generate(self):
         self._generateMap()
         self._generatePlayerAndExit()
 
     def inMap(self, position):
-        (tile_row, tile_col) = position
-        return 1 <= tile_row <= self._height and 1 <= tile_col <= self._width
+        return 1 <= position[0] <= self._height and 1 <= position[1] <= self._width
 
-    def getNeighbors(self, position):
+    def walkable(self, position):
+        return self._dictMap[position[0]][position[1]].isWalkable();
+
+    def getNeighbors(self, position, isGeneration=False):
         (tile_row, tile_col) = position
         if tile_row % 2 > 0:
             neighborsList = [
@@ -52,7 +59,12 @@ class Map:
                 (tile_col-1, tile_row+1),
                 (tile_col, tile_row+1)]
 
-        return list(filter(self.inMap, neighborsList))
+        neighborsList = list(filter(self.inMap, neighborsList))
+
+        if not isGeneration:
+            neighborsList = list(filter(self.walkable, neighborsList))
+
+        return neighborsList
 
     def findAPath(self, start, end):
         toProcess = [start]
@@ -73,9 +85,8 @@ class Map:
         return []
 
     def getCaseAtPos(self, pos):
-        for case in self.getCases():
-            if case.getPosition() == pos:
-                return case
+        if pos[0] in self._dictMap and pos[1] in self._dictMap[pos[1]]:
+            return self. _dictMap[pos[0]][pos[1]]
         # Not found
         return None
 
@@ -194,10 +205,17 @@ class Map:
             # Loop through children
             for child in children:
 
+                visited = False
+
                 # Child is on the closed list
                 for closed_child in closed_list:
                     if child == closed_child:
-                        continue
+                        visited = True
+                        break
+
+                # We found we already checked this
+                if visited:
+                    continue
 
                 # Create the f, g, and h values
                 child.g = current_node.g + 1
@@ -213,8 +231,68 @@ class Map:
                 # Add the child to the open list
                 open_list.append(child)
 
+    # Retourne les cases visibles autour de center avec une certaine
+    # portée de vision
+    def getVisibleCases(self, center, range):
+        results = []
+
+        # Récupère tous les candidats
+        spiral_ring = self.getCaseSpiralRing(center, range)
+
+        for case in spiral_ring:
+            # Récupère la ligne directe
+            line = self.getLineBetweenCases(center, case)
+
+            # Si il n'y a pas de case bloquant la vision (i.e. montagne)
+            # dans la ligne, on ajoute la case
+            if not any(case_inline.getType() == BiomesTypes.MOUNTAIN for case_inline in line):
+                results.append(case)
+
+        return results
+
+    def getLineBetweenCases(self, case1, case2):
+        cube1 = utils.oddQToCube(case1.getPosition()[0], case1.getPosition()[1])
+        cube2 = utils.oddQToCube(case2.getPosition()[0], case2.getPosition()[1])
+
+        # Récupère une ligne de triplets de cube
+        cube_line = utils.cubeLineDraw(cube1[0], cube1[1], cube1[2], cube2[0], cube2[1], cube2[2])
+
+        line = []
+        for cube in cube_line:
+            case = self.getCaseAtPos(utils.cubeToOddQ(cube[0], cube[1], cube[2]))
+
+            # Si la case est dans la carte
+            if case is not None:
+                line.append(case)
+
+        return line
+
+
     def _generatePlayerAndExit(self):
-        print("Not implmented")
+        while True:
+            self._player = self._cases[numpy.random.randint(0, len(self._cases))]
+            self._exit = self._cases[numpy.random.randint(0, len(self._cases))]
+
+            if len(self.getShortestPath(self._player.getPosition(), self._exit.getPosition())) >= settings.MAP_MIN_DIST_PLAYER_EXIT:
+                break
+
+        print("Pos player %s" % str(self._player.getPosition()))
+        print("Pos exit %s" % str(self._exit.getPosition()))
+
+    def _generateMonsters(self):
+        for i in range(0, settings.MONSTERS_NUM):
+            while True:
+                randomTile = self._cases[numpy.random.randint(0, len(self._cases))]
+
+                if randomTile != self._player and randomTile != self._exit \
+                        and randomTile not in self._monsters \
+                        and len(self.getShortestPath(self._player.getPosition(),
+                            self._exit.getPosition())) >= settings.MIN_DIST_PLAYER_MONSTERS:
+                    self._monsters.append(randomTile)
+                    break
+
+        print(self._monsters)
+
 
     def _generateObjects(self):
         print("Not implmented")
@@ -222,15 +300,14 @@ class Map:
     def _generateMap(self):
         totalTiles = self._height * self._width
         tilesRepartition = {}
-        tempMap = {}
         tilesLeft = []
 
         # Init map
         print("Taille totale %s" % totalTiles)
         for i in range(1, self._height + 1):
-            tempMap.update({i: {}})
+            self._dictMap.update({i: {}})
             for j in range(1, self._width + 1):
-                tempMap[i].update({j: Case(-1, (i, j))})
+                self._dictMap[i].update({j: Case(-1, (i, j))})
                 tilesLeft.append((i, j))
 
         # Compute tiles repartition
@@ -253,7 +330,7 @@ class Map:
             for tile in tilesLeft:
                 row_index = tile[0]
                 col_index = tile[1]
-                case = tempMap[row_index][col_index]
+                case = self._dictMap[row_index][col_index]
                 if case.getType() == -1:
                     print("Case %s %s non traitée" % (row_index, col_index))
                     biome = BiomesTypes(numpy.random.randint(0, len(BiomesTypes)))
@@ -280,19 +357,19 @@ class Map:
                     numRetries = 40
                     while batchSize > 0 and numRetries >= 0:
                         randomTileFromBatch = numpy.random.randint(0, len(batchElements))
-                        neighbors = self.getNeighbors(batchElements[randomTileFromBatch].getPosition())
+                        neighbors = self.getNeighbors(batchElements[randomTileFromBatch].getPosition(), True)
                         randomNextTile = numpy.random.randint(0, len(neighbors))
                         nextTile = neighbors[randomNextTile]
                         next_tile_row = nextTile[0]
                         next_tile_col = nextTile[1]
 
-                        if tempMap[next_tile_row][next_tile_col].getType() == -1:
+                        if self._dictMap[next_tile_row][next_tile_col].getType() == -1:
                             print("Nouveau voisin %s %s" % (next_tile_row, next_tile_col))
-                            tempMap[next_tile_row][next_tile_col].setType(biome)
+                            self._dictMap[next_tile_row][next_tile_col].setType(biome)
                             batchSize -= 1
                             tilesRepartition[biome] -= 1
                             numRetries = 40
-                            batchElements.append(tempMap[next_tile_row][next_tile_col])
+                            batchElements.append(self._dictMap[next_tile_row][next_tile_col])
                             tilesLeft.remove((next_tile_row, next_tile_col))
                         else:
                             numRetries -= 1
@@ -300,7 +377,7 @@ class Map:
         print(tilesRepartition)
 
         out = ""
-        for row_index, row in tempMap.items():
+        for row_index, row in self._dictMap.items():
             out += '\n'
             for col_index, col in row.items():
                 out += str(col) + " "
