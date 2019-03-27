@@ -7,6 +7,8 @@ import pygame
 import os
 import random
 
+from data.gui.statusPanelGui import StatusPanelGUI
+
 from objects.gui.guiElement import GuiElement
 from objects.gui.basicButton import BasicButton
 from objects.gui.basicBox import BasicBox
@@ -14,6 +16,7 @@ from objects.gui.basicLabel import BasicLabel
 from objects.gui.textAlignEnum import HTextAlignEnum, VTextAlignEnum
 
 # /!\ Element on same layer shouldn't intersect
+# Loader for references and events handlers
 
 class GuiManager(object):
     def __init__(self):
@@ -29,40 +32,13 @@ class GuiManager(object):
 
     def init(self):
         pygame.font.init()
-        self._fonts['default'] = pygame.font.Font(os.path.join(settings.FONT_PATH, 'VCR_OSD.ttf'), 12)
+        self._fonts['default'] = pygame.font.Font(os.path.join(settings.FONT_PATH, 'VCR_OSD.ttf'), 15)
 
-        box = BasicBox(color=(127, 127, 127, 220), rounded=0.1, position=(0.05, 0.05), size=(0.9, 0.9), windowBased=True, name='menu')
-        text = BasicLabel(font=self._fonts['default'], color=Colors.WHITE.value, text='Hello', parent=box,
-                                position=(0.05, 0.05), size=(0.3, 0.3), vAlign=VTextAlignEnum.CENTER,
-                                hAlign=HTextAlignEnum.CENTER)
-        box.toggleDebug()
-        box.toggleShow()
-        text.toggleDebug()
-        testBtn = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 0, 0),
-                                    selectedColor=(0, 255, 0), textColor=Colors.BLACK.value, text='Click to Hide',
-                                    parent=box, position=(0.5, 0.8), size=(0.1, 0.1), name='closeMenu')
-        testBtn.toggleDebug()
-        self.addToLayer(box, 1)
-        dicti = {
-            0: [
-                {
-                    'name': 'button',
-                    'elemType': BasicButton,
-                    'font': self._fonts['default'],
-                    'baseColor': (128, 255, 0, 200),
-                    'hoveredColor': (255, 255, 128, 100),
-                    'selectedColor': (0, 255, 0),
-                    'textColor': Colors.BLACK.value,
-                    'text': 'Hello',
-                    'position': (0.9, 0.1),
-                    'size': (0.1, 0.1),
-                    'windowBased': True
-                }
-            ]
-        }
-        self.guiLoader(dicti)
-        self._layers[0]['button'].addEventHandler('click', box.toggleShow, 'displayBox')
-        self._layers[1]['menu'].getChildNamedInHierarchy('closeMenu').addEventHandler('click', box.toggleShow, 'hideBox')
+        self.guiLoader(StatusPanelGUI)
+
+        self._layers[0]['openButton'].addEventHandler('click', self._layers[1]['statusPanel'].toggleShow, 'displayBox')
+        statusPanel = self._layers[1]['statusPanel']
+        statusPanel.getChildNamedInHierarchy('closeButton').addEventHandler('click', statusPanel.toggleShow, 'close')
 
     def getElementGuiId(self):
         self._guiElementId += 1
@@ -126,8 +102,6 @@ class GuiManager(object):
 
     def guiLoader(self, dictio):
         for layer, elements in dictio.items():
-            print(layer)
-            print(elements)
             currentLayer = int(layer)
             if layer > self._maxLayer or layer < 0:
                 raise ValueError('Invalid layer value')
@@ -136,6 +110,7 @@ class GuiManager(object):
                 self.addToLayer(guiElem, currentLayer)
 
     def guiNodeCreator(self, node, parent=None):
+        print(node)
         if 'elemType' not in node.keys():
             raise KeyError('No key named "elemType"')
         elemType = node['elemType']  # Add white list for elem type ?
@@ -148,7 +123,7 @@ class GuiManager(object):
             children = node['children']
             del node['children']
 
-        guiElem = elemType(parent=parent, **node)
+        guiElem = elemType(parent=parent, fonts=self._fonts, **node)
         if children is not None:
             for child in children:
                 self.guiNodeCreator(child, parent=guiElem)

@@ -35,6 +35,11 @@ class Entity(object):
         self._inventory = inventory
         self._effects = effects
 
+    def getBaseStats(self):
+        return self._baseStats
+
+    def getCurrentState(self):
+        return self._currentState
 
     def equip(self):
         # Compute total stat

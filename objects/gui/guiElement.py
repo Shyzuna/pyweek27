@@ -1,15 +1,16 @@
 import pygame
 
 # Put hover state here !
-# try to do some handler biding & events
+# Do smth better for event handler
+# improve references
 
 class GuiElement(object):
 
     uniqueId = 0
 
-    def __init__(self, position=(0, 0), size=(0, 0), parent=None,
+    def __init__(self, position=(0, 0), size=(0, 0), parent=None, show=True, fonts=None,
                  flatPos=False, flatSize=False, windowBased=False, debug=False, name=None):
-        self._show = True
+        self._show = show
         self._position = position
         self._flatPosition = None
         self._size = size
@@ -18,6 +19,7 @@ class GuiElement(object):
         self._parent = parent
         self._debug = False
         self._debugSurface = None
+        self._fonts = fonts
         self._debugOptions = {
             'color': (255, 0, 255),
             'width': 2
@@ -83,12 +85,18 @@ class GuiElement(object):
     #  Add remove if needed
     def addReference(self, name, ref):
         self._references[name] = ref
+        self.callEvent('newRef')
 
     #  Add remove if needed
     def addEventHandler(self, event, handler, name):
         if event not in self._eventsHandlers.keys():
             self._eventsHandlers[event] = {}
         self._eventsHandlers[event][name] = handler
+
+    def callEvent(self, event):
+        if event in self._eventsHandlers.keys():
+            for handler in self._eventsHandlers[event].values():
+                handler()
 
     def toggleDebug(self):
         self._debug = not self._debug

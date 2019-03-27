@@ -5,12 +5,12 @@ from objects.gui.basicBox import BasicBox
 from objects.gui.textAlignEnum import HTextAlignEnum, VTextAlignEnum
 
 class BasicButton(GuiElement):
-    def __init__(self, font, baseColor, hoveredColor, selectedColor,
-                 textColor, text='', *args, **kwargs):
+    def __init__(self, baseColor, hoveredColor, selectedColor,
+                 textColor=(0, 0, 0), font='default', text='', *args, **kwargs):
         self._baseColor = baseColor
         self._hoveredColor = hoveredColor
         self._selectedColor = selectedColor
-        self._label = BasicLabel(font, textColor, text, hAlign=HTextAlignEnum.CENTER,
+        self._label = BasicLabel(font=font, color=textColor, text=text, hAlign=HTextAlignEnum.CENTER,
                                  vAlign=VTextAlignEnum.CENTER, *args, **kwargs)
         self._box = BasicBox(baseColor, rounded=0.2, *args, **kwargs)
         self._hovered = False
@@ -33,6 +33,4 @@ class BasicButton(GuiElement):
 
     #  May move this in parent class
     def onClickHandler(self):
-        if 'click' in self._eventsHandlers.keys():
-            for handler in self._eventsHandlers['click'].values():
-                handler()
+        self.callEvent('click')
