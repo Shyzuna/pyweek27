@@ -5,16 +5,15 @@ from objects.gui.basicBox import BasicBox
 from objects.gui.textAlignEnum import HTextAlignEnum, VTextAlignEnum
 
 class BasicButton(GuiElement):
-    def __init__(self, font, baseColor, hoveredColor, selectedColor, textColor,
-                 clickHandler=None, text='', *args, **kwargs):
+    def __init__(self, font, baseColor, hoveredColor, selectedColor,
+                 textColor, text='', *args, **kwargs):
         self._baseColor = baseColor
         self._hoveredColor = hoveredColor
         self._selectedColor = selectedColor
         self._label = BasicLabel(font, textColor, text, hAlign=HTextAlignEnum.CENTER,
                                  vAlign=VTextAlignEnum.CENTER, *args, **kwargs)
-        self._box = BasicBox(baseColor, *args, **kwargs)
+        self._box = BasicBox(baseColor, rounded=0.2, *args, **kwargs)
         self._hovered = False
-        self._clickHandler = clickHandler
         super().__init__(*args, **kwargs)
 
     def ownUpdate(self):
@@ -32,7 +31,8 @@ class BasicButton(GuiElement):
         self._box.display(screen)
         self._label.display(screen)
 
+    #  May move this in parent class
     def onClickHandler(self):
-        print('TEST')
-        if self._clickHandler is not None:
-            self._clickHandler()
+        if 'click' in self._eventsHandlers.keys():
+            for handler in self._eventsHandlers['click'].values():
+                handler()
