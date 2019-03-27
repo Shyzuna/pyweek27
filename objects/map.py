@@ -194,10 +194,17 @@ class Map:
             # Loop through children
             for child in children:
 
+                visited = False
+
                 # Child is on the closed list
                 for closed_child in closed_list:
                     if child == closed_child:
-                        continue
+                        visited = True
+                        break
+
+                # We found we already checked this
+                if visited:
+                    continue
 
                 # Create the f, g, and h values
                 child.g = current_node.g + 1
@@ -212,6 +219,43 @@ class Map:
 
                 # Add the child to the open list
                 open_list.append(child)
+
+    # Retourne les cases visibles autour de center avec une certaine
+    # portée de vision
+    def getVisibleCases(self, center, range):
+        results = []
+
+        # Récupère tous les candidats
+        spiral_ring = self.getCaseSpiralRing(center, range)
+
+        for case in spiral_ring:
+            # Récupère la ligne directe
+            line = self.getLineBetweenCases(center, case)
+
+            # Si il n'y a pas de case bloquant la vision (i.e. montagne)
+            # dans la ligne, on ajoute la case
+            if not any(case_inline.getType() == BiomesTypes.MOUNTAIN for case_inline in line):
+                results.append(case)
+
+        return results
+
+    def getLineBetweenCases(self, case1, case2):
+        cube1 = utils.oddQToCube(case1.getPosition()[0], case1.getPosition()[1])
+        cube2 = utils.oddQToCube(case2.getPosition()[0], case2.getPosition()[1])
+
+        # Récupère une ligne de triplets de cube
+        cube_line = utils.cubeLineDraw(cube1[0], cube1[1], cube1[2], cube2[0], cube2[1], cube2[2])
+
+        line = []
+        for cube in cube_line:
+            case = self.getCaseAtPos(utils.cubeToOddQ(cube[0], cube[1], cube[2]))
+
+            # Si la case est dans la carte
+            if case is not None:
+                line.append(case)
+
+        return line
+
 
     def _generatePlayerAndExit(self):
         print("Not implmented")
