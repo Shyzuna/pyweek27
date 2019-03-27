@@ -28,6 +28,7 @@ class Map:
         self._width = size[1]
         self._player = None
         self._exit = None
+        self._monsters = []
 
     def generate(self):
         self._generateMap()
@@ -233,6 +234,20 @@ class Map:
 
         print("Pos player %s" % str(self._player.getPosition()))
         print("Pos exit %s" % str(self._exit.getPosition()))
+
+    def _generateMonsters(self):
+        for i in range(0, settings.MONSTERS_NUM):
+            while True:
+                randomTile = self._cases[numpy.random.randint(0, len(self._cases))]
+
+                if randomTile != self._player and randomTile != self._exit \
+                        and randomTile not in self._monsters \
+                        and len(self.getShortestPath(self._player.getPosition(),
+                            self._exit.getPosition())) >= settings.MIN_DIST_PLAYER_MONSTERS:
+                    self._monsters.append(randomTile)
+                    break
+
+        print(self._monsters)
 
 
     def _generateObjects(self):
