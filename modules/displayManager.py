@@ -8,7 +8,7 @@ import math
 class DisplayManager:
 
     def __init__(self):
-        pass
+        self.screen = None
 
     def init(self):
         self.flags = pygame.DOUBLEBUF
@@ -53,7 +53,6 @@ class DisplayManager:
         # Display cases
         for case in map.getCases():
             case.draw(self.screen, self.imgs[case.getType().value])
-
 
 
 

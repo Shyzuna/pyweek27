@@ -1,11 +1,14 @@
 import pygame
 
 # Put hover state here !
-# try to do some handler biding
+# try to do some handler biding & events
 
 class GuiElement(object):
+
+    uniqueId = 0
+
     def __init__(self, position=(0, 0), size=(0, 0), parent=None,
-                 flatPos=False, flatSize=False, windowBased=False, debug=False):
+                 flatPos=False, flatSize=False, windowBased=False, debug=False, name=None):
         self._show = True
         self._position = position
         self._flatPosition = None
@@ -19,9 +22,14 @@ class GuiElement(object):
             'color': (255, 0, 255),
             'width': 2
         }
+        if name is None:
+            GuiElement.uniqueId += 1
+            self._name = name if name is not None else '{}-{}'.format(str(type(self)), str(GuiElement.uniqueId))
+        else:  # doesn't check for same name in hierarchy
+            self._name = name
         if self._parent is not None:
             self._parent.addChild(self)
-        self._children = []
+        self._children = {}
         self._options = {
             'flatPos': flatPos,
             'flatSize': flatSize,
@@ -29,6 +37,10 @@ class GuiElement(object):
         }
         self._insideElement = False
         self._clickIn = False
+
+        self._eventsHandlers = {}
+        self._references = {}
+
         self.resize()
 
     def toggleShow(self):
@@ -45,6 +57,38 @@ class GuiElement(object):
 
     def getFlatPosition(self):
         return self._flatPosition
+
+    def getName(self):
+        return self._name
+
+    def getChildren(self):
+        return self._children
+
+    def getChildNamed(self, name):
+        if name in self._children.keys():
+            return self._children[name]
+        return None
+
+    def getChildNamedInHierarchy(self, name, level=None):
+        level = level if level is not None else self
+        children = level.getChildren()
+        if name in children.keys():
+            return children[name]
+        for child in children.values():
+            res = self.getChildNamedInHierarchy(name, child)
+            if res is not None:
+                return res
+        return None
+
+    #  Add remove if needed
+    def addReference(self, name, ref):
+        self._references[name] = ref
+
+    #  Add remove if needed
+    def addEventHandler(self, event, handler, name):
+        if event not in self._eventsHandlers.keys():
+            self._eventsHandlers[event] = {}
+        self._eventsHandlers[event][name] = handler
 
     def toggleDebug(self):
         self._debug = not self._debug
@@ -89,16 +133,15 @@ class GuiElement(object):
     def debugDisplay(self, screen):
         screen.blit(self._debugSurface, (self._flatPosition[0] - self._debugOptions['width'],
                                          self._flatPosition[1] - self._debugOptions['width']))
-
     def ownDisplay(self, screen):
         pass
 
     def displayChildren(self, screen):
-        for child in self._children:
+        for child in self._children.values():
             child.display(screen)
 
     def addChild(self, child):
-        self._children.append(child)
+        self._children[child.getName()] = child
 
     def checkInside(self, mousePos):
         wasInside = self._insideElement
@@ -106,7 +149,7 @@ class GuiElement(object):
         currentElem = None
         if self._show and self._flatRect.collidepoint(mousePos):
             currentElem = self
-            for child in self._children:
+            for child in self._children.values():
                 result = child.checkInside(mousePos)
                 currentElem = result if result is not None else currentElem
             if currentElem == self:
@@ -126,7 +169,7 @@ class GuiElement(object):
         pass
 
     def childrenUpdate(self):
-        for child in self._children:
+        for child in self._children.values():
             child.update()
 
     def onClick(self, value):

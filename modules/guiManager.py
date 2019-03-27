@@ -7,6 +7,7 @@ import pygame
 import os
 import random
 
+from objects.gui.guiElement import GuiElement
 from objects.gui.basicButton import BasicButton
 from objects.gui.basicBox import BasicBox
 from objects.gui.basicLabel import BasicLabel
@@ -20,6 +21,8 @@ class GuiManager(object):
         self._lastMousePos = None
         self._onGuiElement = None
 
+        self._guiElementId = 0
+
         # 5 layers by default
         self._maxLayer = 4
         self._layers = [{} for x in range(0, self._maxLayer + 1)]
@@ -28,27 +31,47 @@ class GuiManager(object):
         pygame.font.init()
         self._fonts['default'] = pygame.font.Font(os.path.join(settings.FONT_PATH, 'VCR_OSD.ttf'), 12)
 
-        box = BasicBox(color=Colors.BLUE.value, position=(0.05, 0.05), size=(0.9, 0.9), windowBased=True)
+        box = BasicBox(color=(127, 127, 127, 220), rounded=0.1, position=(0.05, 0.05), size=(0.9, 0.9), windowBased=True, name='menu')
         text = BasicLabel(font=self._fonts['default'], color=Colors.WHITE.value, text='Hello', parent=box,
                                 position=(0.05, 0.05), size=(0.3, 0.3), vAlign=VTextAlignEnum.CENTER,
                                 hAlign=HTextAlignEnum.CENTER)
+        box.toggleDebug()
         box.toggleShow()
         text.toggleDebug()
-        testBtn = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 255, 128),
+        testBtn = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 0, 0),
                                     selectedColor=(0, 255, 0), textColor=Colors.BLACK.value, text='Click to Hide',
-                                    parent=box, position=(0.5, 0.8), size=(0.1, 0.1),
-                                    clickHandler=box.toggleShow)
+                                    parent=box, position=(0.5, 0.8), size=(0.1, 0.1), name='closeMenu')
         testBtn.toggleDebug()
-        button = BasicButton(font=self._fonts['default'], baseColor=(128, 255, 0), hoveredColor=(128, 255, 128),
-                                    selectedColor=(0, 255, 0), textColor=Colors.BLACK.value, text='Click to Show',
-                                    position=(0.9, 0.1), size=(0.1, 0.1), clickHandler=box.toggleShow, windowBased=True)
-        self.addToLayer(button, 0, 'openMenu')
-        self.addToLayer(box, 1, 'menu')
+        self.addToLayer(box, 1)
+        dicti = {
+            0: [
+                {
+                    'name': 'button',
+                    'elemType': BasicButton,
+                    'font': self._fonts['default'],
+                    'baseColor': (128, 255, 0, 200),
+                    'hoveredColor': (255, 255, 128, 100),
+                    'selectedColor': (0, 255, 0),
+                    'textColor': Colors.BLACK.value,
+                    'text': 'Hello',
+                    'position': (0.9, 0.1),
+                    'size': (0.1, 0.1),
+                    'windowBased': True
+                }
+            ]
+        }
+        self.guiLoader(dicti)
+        self._layers[0]['button'].addEventHandler('click', box.toggleShow, 'displayBox')
+        self._layers[1]['menu'].getChildNamedInHierarchy('closeMenu').addEventHandler('click', box.toggleShow, 'hideBox')
 
-    def addToLayer(self, guielement, layer, name):
+    def getElementGuiId(self):
+        self._guiElementId += 1
+        return self._guiElementId
+
+    def addToLayer(self, guiElem, layer):
         if layer > self._maxLayer:
             return
-        self._layers[layer][name] = guielement
+        self._layers[layer][guiElem.getName()] = guiElem
 
     def checkMousePosition(self, pixel):
         # Check cases
@@ -100,6 +123,36 @@ class GuiManager(object):
         for l in range(0, self._maxLayer + 1):
             for guiElem in self._layers[l].values():
                 guiElem.display(screen)
+
+    def guiLoader(self, dictio):
+        for layer, elements in dictio.items():
+            print(layer)
+            print(elements)
+            currentLayer = int(layer)
+            if layer > self._maxLayer or layer < 0:
+                raise ValueError('Invalid layer value')
+            for elem in elements:
+                guiElem = self.guiNodeCreator(elem)
+                self.addToLayer(guiElem, currentLayer)
+
+    def guiNodeCreator(self, node, parent=None):
+        if 'elemType' not in node.keys():
+            raise KeyError('No key named "elemType"')
+        elemType = node['elemType']  # Add white list for elem type ?
+        del node['elemType']
+        if not issubclass(elemType, GuiElement):
+            raise TypeError('Invalid element type')
+
+        children = None
+        if 'children' in node.keys():
+            children = node['children']
+            del node['children']
+
+        guiElem = elemType(parent=parent, **node)
+        if children is not None:
+            for child in children:
+                self.guiNodeCreator(child, parent=guiElem)
+        return guiElem
 
 
 guiManager = GuiManager()
