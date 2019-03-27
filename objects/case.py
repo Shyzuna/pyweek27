@@ -1,4 +1,5 @@
 from settings import settings
+from settings import biomeSettings
 from modules.utils import cubeRound
 from modules.utils import cubeToOddQ
 from objects.hex import Hex
@@ -30,6 +31,9 @@ class Case(object):
 
     def setType(self, type):
         self._type = type
+
+    def isWalkable(self):
+        return biomeSettings.BIOMES_SETTINGS[self._type]['is_walkable']
 
     def draw(self, screen, img):
         # Offset entre le centre et le top left corner du sprite
