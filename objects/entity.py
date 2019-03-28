@@ -10,6 +10,7 @@ class Entity(object):
         self._case = case
 
         self._experience = experience
+        self._nextLevelExperience = 100
         self._level = level
         self._name = name
         self._soul = soul
@@ -28,7 +29,7 @@ class Entity(object):
                     self._totalStats[stat] += equipments[slot].getBaseStats()[stat]
                 # Subtract shield defense value ?
             else:
-                self._equipments = equipments[slot] = None
+                self._equipments[slot] = None
 
         self._currentState = copy.deepcopy(self._totalStats)
 
@@ -40,6 +41,24 @@ class Entity(object):
 
     def getCurrentState(self):
         return self._currentState
+
+    def getCurrentHealth(self):
+        return self._currentState[StatsEnum.HP]
+
+    def getMaxHealth(self):
+        return self._baseStats[StatsEnum.HP]
+
+    def getCurrentMana(self):
+        return self._currentState[StatsEnum.MANA]
+
+    def getMaxMana(self):
+        return self._baseStats[StatsEnum.MANA]
+
+    def getCurrentXp(self):
+        return self._experience
+
+    def getNextLevelXp(self):
+        return self._nextLevelExperience
 
     def equip(self):
         # Compute total stat

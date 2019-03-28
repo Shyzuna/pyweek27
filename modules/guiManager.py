@@ -15,6 +15,9 @@ from objects.gui.basicBox import BasicBox
 from objects.gui.basicLabel import BasicLabel
 from objects.gui.textAlignEnum import HTextAlignEnum, VTextAlignEnum
 
+from objects.entity import Entity
+from objects.enums.statsEnum import StatsEnum
+
 # /!\ Element on same layer shouldn't intersect
 # Loader for references and events handlers
 
@@ -30,6 +33,12 @@ class GuiManager(object):
         self._maxLayer = 4
         self._layers = [{} for x in range(0, self._maxLayer + 1)]
 
+        # tmp
+        self._player = Entity('toto', baseStats={StatsEnum.HP: 100, StatsEnum.MANA: 500})
+        self._player._experience = 30
+        self._player._currentState[StatsEnum.HP] = 60
+
+
     def init(self):
         pygame.font.init()
         self._fonts['default'] = pygame.font.Font(os.path.join(settings.FONT_PATH, 'VCR_OSD.ttf'), 15)
@@ -39,6 +48,21 @@ class GuiManager(object):
         self._layers[0]['openButton'].addEventHandler('click', self._layers[1]['statusPanel'].toggleShow, 'displayBox')
         statusPanel = self._layers[1]['statusPanel']
         statusPanel.getChildNamedInHierarchy('closeButton').addEventHandler('click', statusPanel.toggleShow, 'close')
+        statusPanel.getChildNamedInHierarchy('linkedLevel').addReference('player', self._player)
+        charData = statusPanel.getChildNamedInHierarchy('charData')
+        statusPanel.addEventHandler('show', charData.redrawChildren, 'redrawChildren')
+        statusPanel.getChildNamedInHierarchy('hpProgressBar').addReferences({
+            'current': self._player.getCurrentHealth,
+            'max': self._player.getMaxHealth
+        })
+        statusPanel.getChildNamedInHierarchy('manaProgressBar').addReferences({
+            'current': self._player.getCurrentMana,
+            'max': self._player.getMaxMana
+        })
+        statusPanel.getChildNamedInHierarchy('xpProgressBar').addReferences({
+            'current': self._player.getCurrentXp,
+            'max': self._player.getNextLevelXp
+        })
 
     def getElementGuiId(self):
         self._guiElementId += 1

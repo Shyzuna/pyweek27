@@ -1,5 +1,5 @@
 import pygame
-
+import types
 # Put hover state here !
 # Do smth better for event handler
 # improve references
@@ -8,7 +8,7 @@ class GuiElement(object):
 
     uniqueId = 0
 
-    def __init__(self, position=(0, 0), size=(0, 0), parent=None, show=True, fonts=None,
+    def __init__(self, position=(0, 0), size=(0, 0), parent=None, show=True, fonts=None, refOptions={},
                  flatPos=False, flatSize=False, windowBased=False, debug=False, name=None):
         self._show = show
         self._position = position
@@ -17,7 +17,7 @@ class GuiElement(object):
         self._flatSize = None
         self._flatRect = None
         self._parent = parent
-        self._debug = False
+        self._debug = debug
         self._debugSurface = None
         self._fonts = fonts
         self._debugOptions = {
@@ -42,14 +42,19 @@ class GuiElement(object):
 
         self._eventsHandlers = {}
         self._references = {}
+        self._refOptions = refOptions
 
         self.resize()
 
     def toggleShow(self):
         self._show = not self._show
+        self.callEvent('show' if self._show else 'hide')
 
     def getSize(self):
         return self._size
+
+    def setSize(self, size):
+        self._size = size
 
     def getPosition(self):
         return self._position
@@ -87,11 +92,32 @@ class GuiElement(object):
         self._references[name] = ref
         self.callEvent('newRef')
 
+    def addReferences(self, refs):
+        for name, ref in refs.items():
+            self._references[name] = ref
+        self.callEvent('newRef')
+
     #  Add remove if needed
     def addEventHandler(self, event, handler, name):
         if event not in self._eventsHandlers.keys():
             self._eventsHandlers[event] = {}
         self._eventsHandlers[event][name] = handler
+
+    def getFormattedReferences(self):
+        # check ref options
+        formatRef = {}
+        for key, value in self._refOptions.items():
+            if key not in self._references.keys():
+                if 'mandatory' in value.keys():
+                    print("Missing mandatory reference {} for gui element.".format(key))
+                    return None
+            else:
+                if 'type' not in value.keys() or not isinstance(self._references[key], value['type']):
+                    print("Invalid type of reference {} for gui element.".format(key))
+                    return None
+                formatRef[key] = self._references[key]() if isinstance(self._references[key], types.FunctionType) or\
+                                                            isinstance(self._references[key], types.MethodType) else self._references[key]
+        return formatRef
 
     def callEvent(self, event):
         if event in self._eventsHandlers.keys():
@@ -121,6 +147,10 @@ class GuiElement(object):
 
     def redraw(self):
         self.redrawDebug()
+
+    def redrawChildren(self):
+        for child in self._children.values():
+            child.redraw()
 
     def redrawDebug(self):
         self._debugSurface = pygame.Surface((self._flatSize[0] + self._debugOptions['width'] * 2,

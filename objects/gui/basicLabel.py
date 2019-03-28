@@ -15,7 +15,6 @@ class BasicLabel(GuiElement):
 
     def redraw(self):
         super().redraw()
-        print(self._font)
         self._textSurface = self._fonts[self._font].render(self._text, True, self._color)
 
     def ownDisplay(self, screen):
@@ -27,3 +26,7 @@ class BasicLabel(GuiElement):
             if self._vAlign == VTextAlignEnum.BOTTOM else (self._flatSize[1] - textSize[1]) / 2) + self._flatPosition[1]
         )
         screen.blit(self._textSurface, position)
+
+    def setText(self, text):
+        self._text = text
+        self.redraw()
