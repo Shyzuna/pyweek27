@@ -32,8 +32,13 @@ class Map:
         self._monsters = []
 
     def generate(self, imgs, negativImgs, baseH):
-        self._generateMap(imgs, negativImgs, baseH)
-        self._generatePlayerAndExit()
+        done = False
+
+        while not done:
+            doneMap = self._generateMap(imgs, negativImgs, baseH)
+            donePlayer = self._generatePlayerAndExit()
+            doneMonsters = self._generateMonsters()
+            done = doneMap and donePlayer and doneMonsters
 
     def inMap(self, position):
         return 1 <= position[0] <= self._height and 1 <= position[1] <= self._width
@@ -276,30 +281,35 @@ class Map:
 
 
     def _generatePlayerAndExit(self):
+        attempt = 0
         while True:
             self._player = self._cases[numpy.random.randint(0, len(self._cases))]
             self._exit = self._cases[numpy.random.randint(0, len(self._cases))]
-
+            attempt += 1
             if len(self.getShortestPath(self._player.getPosition(), self._exit.getPosition())) >= settings.MAP_MIN_DIST_PLAYER_EXIT:
-                break
-
-        print("Pos player %s" % str(self._player.getPosition()))
-        print("Pos exit %s" % str(self._exit.getPosition()))
+                print("Pos player %s" % str(self._player.getPosition()))
+                print("Pos exit %s" % str(self._exit.getPosition()))
+                return True
+            elif attempt > 10:
+                return False
 
     def _generateMonsters(self):
         for i in range(0, settings.MONSTERS_NUM):
+            attempt = 0
             while True:
                 randomTile = self._cases[numpy.random.randint(0, len(self._cases))]
-
+                attempt += 1
                 if randomTile != self._player and randomTile != self._exit \
                         and randomTile not in self._monsters \
                         and len(self.getShortestPath(self._player.getPosition(),
                             self._exit.getPosition())) >= settings.MIN_DIST_PLAYER_MONSTERS:
                     self._monsters.append(randomTile)
                     break
+                elif attempt > 10:
+                    return False
 
         print(self._monsters)
-
+        return True
 
     def _generateObjects(self):
         print("Not implmented")
@@ -400,6 +410,7 @@ class Map:
         #         self._cases.append(case)
 
         print(out)
+        return True
 
     def getCases(self):
         return self._cases
