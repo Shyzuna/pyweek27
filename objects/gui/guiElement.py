@@ -37,12 +37,16 @@ class GuiElement(object):
             'flatSize': flatSize,
             'windowBased': windowBased
         }
+        self._watchedValues = {}
+        self._watchers = {}
         self._insideElement = False
         self._clickIn = False
 
         self._eventsHandlers = {}
         self._references = {}
         self._refOptions = refOptions
+
+        self.addEventHandler('redraw', self.redraw, 'redraw')
 
         self.resize()
 
@@ -86,6 +90,17 @@ class GuiElement(object):
             if res is not None:
                 return res
         return None
+
+    #  Maybe not removable ...
+    def addWatcher(self, func, name, event='redraw'):
+        print(func)
+        self._watchers[name] = event
+        return watcherDecorator(func, name, self.myWatcher)
+
+    def myWatcher(self, name, value):
+        if not name in self._watchedValues.keys() or self._watchedValues[name] != value:
+            self._watchedValues[name] = value
+            self.callEvent(self._watchers[name])
 
     #  Add remove if needed
     def addReference(self, name, ref):
@@ -220,3 +235,10 @@ class GuiElement(object):
 
     def onClickHandler(self):
         pass
+
+# used to decorate on the fly for watcher
+def watcherDecorator(func, name, watcher):
+    def wrapper(value):
+        func(value)
+        watcher(name, value)
+    return wrapper

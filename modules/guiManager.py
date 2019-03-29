@@ -66,6 +66,29 @@ class GuiManager(object):
             'max': self._player.getNextLevelXp
         })
 
+        frontManaBar = self._layers[0]['statusFrontElem'].getChildNamedInHierarchy('manaProgressBar')
+        frontManaBar.addReferences({
+            'current': self._player.getCurrentMana,
+            'max': self._player.getMaxMana
+        })
+        # better solution ?
+        self._player.setCurrentMana = frontManaBar.addWatcher(self._player.setCurrentMana, 'manaWatcher')
+        frontManaBar = self._layers[0]['statusFrontElem'].getChildNamedInHierarchy('hpProgressBar')
+        frontManaBar.addReferences({
+            'current': self._player.getCurrentHealth,
+            'max': self._player.getMaxHealth
+        })
+        # better solution ?
+        self._player.setCurrentHp = frontManaBar.addWatcher(self._player.setCurrentHp, 'hpWatcher')
+        frontManaBar = self._layers[0]['statusFrontElem'].getChildNamedInHierarchy('xpProgressBar')
+        frontManaBar.addReferences({
+            'current': self._player.getCurrentXp,
+            'max': self._player.getNextLevelXp
+        })
+        # better solution ?
+        self._player.getCurrentXp = frontManaBar.addWatcher(self._player.getCurrentXp, 'xpWatcher')
+
+
     def getElementGuiId(self):
         self._guiElementId += 1
         return self._guiElementId
@@ -76,6 +99,10 @@ class GuiManager(object):
         self._layers[layer][guiElem.getName()] = guiElem
 
     def checkMousePosition(self, pixel):
+
+        # tmp
+        self._player.setCurrentMana(random.randint(0, 100))
+
         # Check cases
         map = modules.gameManager.gameManager.getMap()
         case = map.getCaseAtPixel(pixel)
@@ -91,7 +118,6 @@ class GuiManager(object):
             print("Le curseur n'est pas sur une case")
             return None
 
-        print(case.getPosition())
         # Test getNeighbours
         #neighbours = map.getCaseNeighbours(case)
         # Test getSpiralRing

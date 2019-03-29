@@ -60,6 +60,21 @@ class Entity(object):
     def getNextLevelXp(self):
         return self._nextLevelExperience
 
+    def setBaseStats(self, stat, value):
+        self._baseStats[stat] = value
+
+    def setCurrentState(self, stat, value):
+        self._currentState[stat] = value
+
+    def setCurrentMana(self, value):
+        self._currentState[StatsEnum.MANA] = value
+
+    def setCurrentHp(self, value):
+        self._currentState[StatsEnum.HP] = value
+
+    def setCurrentXp(self, value):
+        self._experience = value
+
     def equip(self):
         # Compute total stat
         pass

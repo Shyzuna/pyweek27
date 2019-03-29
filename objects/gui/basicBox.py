@@ -2,11 +2,16 @@ from objects.gui.guiElement import GuiElement
 import pygame
 
 class BasicBox(GuiElement):
-    def __init__(self, color=None, rounded=0, *args, **kwargs):
+    def __init__(self, color=None, rounded=0, border=0, borderColor=(0, 0, 0), *args, **kwargs):
         self._color = color
         self._surface = None
         self._savedSurface = None
         self._rounded = rounded
+
+        # not used ATM
+        self._border = border
+        self._borderColor = borderColor
+
         super().__init__(*args, **kwargs)
 
     def redraw(self):

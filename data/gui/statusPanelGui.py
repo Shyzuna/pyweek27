@@ -1,10 +1,12 @@
 # root elem should have a name
 from objects.gui.basicBox import BasicBox
+from objects.gui.guiElement import GuiElement
 from objects.gui.basicButton import BasicButton
 from objects.gui.basicLabel import BasicLabel
 from objects.gui.linkedLabel import LinkedLabel
 from objects.gui.progressBar import ProgressBar
 from objects.entity import Entity
+from objects.gui.textAlignEnum import HTextAlignEnum, VTextAlignEnum
 
 import types
 
@@ -20,6 +22,122 @@ StatusPanelGUI = {
             'position': (0.9, 0.1),
             'size': (0.1, 0.1),
             'windowBased': True
+        },
+        {
+            'name': 'statusFrontElem',
+            'elemType': GuiElement,
+            'position': (0, 0.9),
+            'size': (0.2, 0.1),
+            'windowBased': True,
+            'children': [
+                {
+                    'elemType': BasicBox,
+                    'color': (100, 100, 100, 220),
+                    'rounded': 0.2,
+                    'position': (0.0, 0.0),
+                    'size': (0.2, 0.33),
+                    'children': [
+                        {
+                            'elemType': BasicLabel,
+                            'text': 'HP',
+                            'position': (0.0, 0.0),
+                            'size': (1, 1),
+                            'vAlign': VTextAlignEnum.CENTER,
+                            'hAlign': HTextAlignEnum.CENTER
+                        }
+                    ]
+                },
+                {
+                    'name': 'hpProgressBar',
+                    'elemType': ProgressBar,
+                    'currentRef': 'current',
+                    'maxRef': 'max',
+                    'position': (0.2, 0.0),
+                    'size': (0.8, 0.33),
+                    'refOptions': {
+                        'max': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        },
+                        'current': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        }
+                    }
+                },
+                {
+                    'elemType': BasicBox,
+                    'color': (100, 100, 100, 220),
+                    'rounded': 0.2,
+                    'position': (0.0, 0.33),
+                    'size': (0.2, 0.33),
+                    'children': [
+                        {
+                            'elemType': BasicLabel,
+                            'text': 'MANA',
+                            'position': (0.0, 0.0),
+                            'size': (1, 1),
+                            'vAlign': VTextAlignEnum.CENTER,
+                            'hAlign': HTextAlignEnum.CENTER
+                        }
+                    ]
+                },
+                {
+                    'name': 'manaProgressBar',
+                    'elemType': ProgressBar,
+                    'currentRef': 'current',
+                    'maxRef': 'max',
+                    'position': (0.2, 0.33),
+                    'size': (0.8, 0.33),
+                    'barColor': (16, 171, 255),
+                    'refOptions': {
+                        'max': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        },
+                        'current': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        }
+                    }
+                },
+                {
+                    'elemType': BasicBox,
+                    'color': (100, 100, 100, 220),
+                    'rounded': 0.2,
+                    'position': (0.0, 0.66),
+                    'size': (0.2, 0.33),
+                    'children': [
+                        {
+                            'elemType': BasicLabel,
+                            'text': 'XP',
+                            'position': (0.0, 0.0),
+                            'size': (1, 1),
+                            'vAlign': VTextAlignEnum.CENTER,
+                            'hAlign': HTextAlignEnum.CENTER
+                        }
+                    ]
+                },
+                {
+                    'name': 'xpProgressBar',
+                    'elemType': ProgressBar,
+                    'currentRef': 'current',
+                    'maxRef': 'max',
+                    'position': (0.2, 0.66),
+                    'size': (0.8, 0.33),
+                    'barColor': (255, 237, 15),
+                    'refOptions': {
+                        'max': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        },
+                        'current': {
+                            'mandatory': True,
+                            'type': types.MethodType
+                        }
+                    }
+                }
+            ]
         }
     ],
     1: [

@@ -99,7 +99,6 @@ class Case(object):
     def checkHover2(self, mask, point):
         # care add offset if scrolling
         if self._rect.collidepoint(point):
-            print(self.getPosition())
             offsetX = point[0] - self._rect.x
             offsetY = point[1] - self._rect.y
             return self._mask.overlap(mask, (offsetX, offsetY))
