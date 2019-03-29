@@ -230,6 +230,7 @@ class Map:
 
                 # Add the child to the open list
                 open_list.append(child)
+        return []
 
     # Retourne les cases visibles autour de center avec une certaine
     # portée de vision
@@ -323,7 +324,7 @@ class Map:
             randLastTye = numpy.random.randint(0, len(BiomesTypes))
             tilesRepartition[BiomesTypes(randLastTye)] += totalTiles - randomTotalTiles
 
-        print(tilesRepartition)
+        #print(tilesRepartition)
 
         # Fill map
         while len(tilesLeft) > 0:
@@ -332,7 +333,7 @@ class Map:
                 col_index = tile[1]
                 case = self._dictMap[row_index][col_index]
                 if case.getType() == -1:
-                    print("Case %s %s non traitée" % (row_index, col_index))
+                    #print("Case %s %s non traitée" % (row_index, col_index))
                     biome = BiomesTypes(numpy.random.randint(0, len(BiomesTypes)))
                     batchSize = numpy.random.randint(biomeSettings.BIOMES_SETTINGS[biome]['size_range'][0],
                                                      biomeSettings.BIOMES_SETTINGS[biome]['size_range'][1] + 1)
@@ -345,7 +346,7 @@ class Map:
                     if batchSize > tilesRepartition[biome]:
                         batchSize = tilesRepartition[biome]
 
-                    print("Taille du batch %s de type %s" % (batchSize, biome))
+                    #print("Taille du batch %s de type %s" % (batchSize, biome))
 
                     case.setType(biome)
                     batchElements = [case]
@@ -364,7 +365,7 @@ class Map:
                         next_tile_col = nextTile[1]
 
                         if self._dictMap[next_tile_row][next_tile_col].getType() == -1:
-                            print("Nouveau voisin %s %s" % (next_tile_row, next_tile_col))
+                            #print("Nouveau voisin %s %s" % (next_tile_row, next_tile_col))
                             self._dictMap[next_tile_row][next_tile_col].setType(biome)
                             batchSize -= 1
                             tilesRepartition[biome] -= 1
@@ -374,8 +375,8 @@ class Map:
                         else:
                             numRetries -= 1
 
-        print(tilesRepartition)
-
+        #print(tilesRepartition)
+        #print(self._dictMap)
         out = ""
         for row_index, row in self._dictMap.items():
             out += '\n'
@@ -383,7 +384,27 @@ class Map:
                 out += str(col) + " "
                 self._cases.append(col)
 
+        # for j in range(1,settings.TILES_NUM_HEIGHT + 1):
+        #     out += '\n'
+        #     for i in range(settings.TILES_NUM_WIDTH, 1, -1):
+        #         case = self._dictMap[i][j]
+        #         out += str(case) + " "
+        #         self._cases.append(case)
+
         print(out)
 
     def getCases(self):
         return self._cases
+
+    def displayMap(self, screen, imgs, negativImgs):
+        # for j in range(0, settings.TILES_NUM_HEIGHT):
+        #     for i in range(settings.TILES_NUM_WIDTH-1, 0, -1):
+        #         case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
+        #         case.draw(screen, imgs[case.getType().value])
+        for i in range(0, settings.TILES_NUM_WIDTH - 1):
+            for j in range(settings.TILES_NUM_HEIGHT - 1, -1, -2):
+                case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
+                case.draw2(screen, imgs[case.getType().value], negativImgs[case.getType().value], imgs[0].get_size()[1])
+            for j in range(settings.TILES_NUM_HEIGHT - 2, -1, -2):
+                case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
+                case.draw2(screen, imgs[case.getType().value], negativImgs[case.getType().value], imgs[0].get_size()[1])

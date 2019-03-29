@@ -10,7 +10,6 @@ class BasicLabel(GuiElement):
         self._textSurface = None
         self._vAlign = vAlign
         self._hAlign = hAlign
-        print(font)
         super().__init__(*args, **kwargs)
 
     def redraw(self):

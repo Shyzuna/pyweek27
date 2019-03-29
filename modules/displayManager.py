@@ -9,6 +9,7 @@ class DisplayManager:
 
     def __init__(self):
         self.screen = None
+        self._negativImgs = {}
 
     def init(self):
         self.flags = pygame.DOUBLEBUF
@@ -30,15 +31,22 @@ class DisplayManager:
 
     def loadImgs(self):
         self.imgs = {}
-
         # Load hex images
         for biome in BiomesTypes:
             try:
                 img = pygame.image.load(os.path.join(settings.HEX_PATH, str(biome.value) + ".png"))
-                self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
+                #self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
+                #self.imgs[biome.value] = pygame.transform.scale(img, (img.get_size()[0]*3, img.get_size()[1]*3))
+                factor = float(settings.TILE_WIDTH)/float(img.get_size()[0])
+                self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, int(img.get_size()[1] * factor)))
+
+                # create
+                self._negativImgs[biome.value] = self.imgs[biome.value].copy()
+                self._negativImgs[biome.value].fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGBA_MAX)
+                self._negativImgs[biome.value].fill((255, 255, 255, 120), special_flags=pygame.BLEND_RGBA_MIN)
             except Exception as e:
                 print(e)
-                pass
+                #pass
 
     def createBaseMapSurface(self):
         self.baseMapSurface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
@@ -51,8 +59,13 @@ class DisplayManager:
         self.screen.blit(self.baseMapSurface, (0, 0))
 
         # Display cases
-        for case in map.getCases():
-            case.draw(self.screen, self.imgs[case.getType().value])
+        # i = 0
+        # for case in map.getCases():
+        #     case.draw(self.screen, self.imgs[case.getType().value])
+        #     i += 1
+        #     if i == 15:
+        #         return
+        map.displayMap(self.screen, self.imgs, self._negativImgs)
 
 
 

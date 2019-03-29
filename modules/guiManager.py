@@ -33,6 +33,8 @@ class GuiManager(object):
         self._maxLayer = 4
         self._layers = [{} for x in range(0, self._maxLayer + 1)]
 
+        self._selectedCases = None
+
         # tmp
         self._player = Entity('toto', baseStats={StatsEnum.HP: 100, StatsEnum.MANA: 500})
         self._player._experience = 30
@@ -77,11 +79,16 @@ class GuiManager(object):
         # Check cases
         map = modules.gameManager.gameManager.getMap()
         case = map.getCaseAtPixel(pixel)
+        # deselect previous cases
+        if self._selectedCases is not None:
+            for case in self._selectedCases:
+                case.toggleSelected()
 
         if case is None:
             print("Le curseur n'est pas sur une case")
             return None
 
+        print(case.getPosition())
         # Test getNeighbours
         #neighbours = map.getCaseNeighbours(case)
         # Test getSpiralRing
@@ -89,14 +96,19 @@ class GuiManager(object):
         # Test getShortestPath
         # path = map.getShortestPath(case.getPosition(), map.getCaseAtPos((2, 2)).getPosition())
         # Test getVisibleCases
-        visible_cases = map.getVisibleCases(case, 3)
+        self._selectedCases = map.getVisibleCases(case, 3)
 
         # Change neighbours type
         # if a path has been found
-        if visible_cases is not None:
-            type = random.choice([BiomesTypes.PLAIN, BiomesTypes.FOREST, BiomesTypes.DESERT])
-            for _case in visible_cases:
-               _case._type = type
+        # if visible_cases is not None:
+        #     type = random.choice([BiomesTypes.PLAIN, BiomesTypes.FOREST, BiomesTypes.DESERT])
+        #     for _case in visible_cases:
+        #        _case._type = type
+
+        # Select new cases
+        if self._selectedCases is not None:
+            for case in self._selectedCases:
+                case.toggleSelected()
 
     def checkOnClick(self, value):
         if self._onGuiElement is not None:
@@ -134,7 +146,6 @@ class GuiManager(object):
                 self.addToLayer(guiElem, currentLayer)
 
     def guiNodeCreator(self, node, parent=None):
-        print(node)
         if 'elemType' not in node.keys():
             raise KeyError('No key named "elemType"')
         elemType = node['elemType']  # Add white list for elem type ?

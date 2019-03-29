@@ -31,9 +31,7 @@ class ProgressBar(GuiElement):
     def computePercent(self):
         formatRef = self.getFormattedReferences()
         if formatRef is not None:
-            print(self._name)
             # Ref option should match currentRef & maxRef
-            print(formatRef)
             current = int(formatRef[self._currentRef])
             max = int(formatRef[self._maxRef])
             if max > 0:
