@@ -1,5 +1,6 @@
 
 import numpy
+import pygame
 
 from settings.enums import BiomesTypes
 from settings import biomeSettings
@@ -30,8 +31,8 @@ class Map:
         self._exit = None
         self._monsters = []
 
-    def generate(self):
-        self._generateMap()
+    def generate(self, imgs, negativImgs, baseH):
+        self._generateMap(imgs, negativImgs, baseH)
         self._generatePlayerAndExit()
 
     def inMap(self, position):
@@ -91,8 +92,13 @@ class Map:
         return None
 
     def getCaseAtPixel(self, point):
+        mask = pygame.Mask((1, 1))
+        mask.fill()
+        # for case in self.getCases():
+        #     if case.checkHover(point):
+        #         return case
         for case in self.getCases():
-            if case.checkHover(point):
+            if case.checkHover2(mask, point) is not None:
                 return case
         # Not found
         return None
@@ -298,7 +304,7 @@ class Map:
     def _generateObjects(self):
         print("Not implmented")
 
-    def _generateMap(self):
+    def _generateMap(self, imgs, negativImgs, baseH):
         totalTiles = self._height * self._width
         tilesRepartition = {}
         tilesLeft = []
@@ -349,6 +355,7 @@ class Map:
                     #print("Taille du batch %s de type %s" % (batchSize, biome))
 
                     case.setType(biome)
+                    case.init(imgs[biome.value], negativImgs[biome.value], baseH)
                     batchElements = [case]
                     batchSize -= 1
                     tilesRepartition[biome] -= 1
@@ -367,6 +374,7 @@ class Map:
                         if self._dictMap[next_tile_row][next_tile_col].getType() == -1:
                             #print("Nouveau voisin %s %s" % (next_tile_row, next_tile_col))
                             self._dictMap[next_tile_row][next_tile_col].setType(biome)
+                            self._dictMap[next_tile_row][next_tile_col].init(imgs[biome.value], negativImgs[biome.value], baseH)
                             batchSize -= 1
                             tilesRepartition[biome] -= 1
                             numRetries = 40
@@ -396,7 +404,7 @@ class Map:
     def getCases(self):
         return self._cases
 
-    def displayMap(self, screen, imgs, negativImgs):
+    def displayMap(self, screen, baseH):
         # for j in range(0, settings.TILES_NUM_HEIGHT):
         #     for i in range(settings.TILES_NUM_WIDTH-1, 0, -1):
         #         case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
@@ -404,7 +412,7 @@ class Map:
         for i in range(0, settings.TILES_NUM_WIDTH - 1):
             for j in range(settings.TILES_NUM_HEIGHT - 1, -1, -2):
                 case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
-                case.draw2(screen, imgs[case.getType().value], negativImgs[case.getType().value], imgs[0].get_size()[1])
+                case.draw2(screen, baseH)
             for j in range(settings.TILES_NUM_HEIGHT - 2, -1, -2):
                 case = self._cases[j*settings.TILES_NUM_HEIGHT + i]
-                case.draw2(screen, imgs[case.getType().value], negativImgs[case.getType().value], imgs[0].get_size()[1])
+                case.draw2(screen, baseH)

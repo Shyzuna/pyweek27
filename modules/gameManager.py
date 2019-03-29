@@ -20,7 +20,7 @@ class GameManager:
         #mapManager.init()
         guiManager.init()
         map = Map((settings.TILES_NUM_HEIGHT, settings.TILES_NUM_WIDTH))
-        map.generate()
+        map.generate(displayManager.getImages(), displayManager.getNegativImages(), displayManager.getBaseH())
         print(map.findAPath((1,1), (6,6)))
         self._map = map
 

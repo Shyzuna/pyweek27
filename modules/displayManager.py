@@ -10,6 +10,9 @@ class DisplayManager:
     def __init__(self):
         self.screen = None
         self._negativImgs = {}
+        self._imgs = {}
+
+        self._baseH = 0
 
     def init(self):
         self.flags = pygame.DOUBLEBUF
@@ -30,7 +33,6 @@ class DisplayManager:
         self.loadImgs()
 
     def loadImgs(self):
-        self.imgs = {}
         # Load hex images
         for biome in BiomesTypes:
             try:
@@ -38,15 +40,25 @@ class DisplayManager:
                 #self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, settings.TILE_HEIGHT))
                 #self.imgs[biome.value] = pygame.transform.scale(img, (img.get_size()[0]*3, img.get_size()[1]*3))
                 factor = float(settings.TILE_WIDTH)/float(img.get_size()[0])
-                self.imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, int(img.get_size()[1] * factor)))
+                self._imgs[biome.value] = pygame.transform.scale(img, (settings.TILE_WIDTH, int(img.get_size()[1] * factor)))
 
                 # create
-                self._negativImgs[biome.value] = self.imgs[biome.value].copy()
+                self._negativImgs[biome.value] = self._imgs[biome.value].copy()
                 self._negativImgs[biome.value].fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGBA_MAX)
                 self._negativImgs[biome.value].fill((255, 255, 255, 120), special_flags=pygame.BLEND_RGBA_MIN)
             except Exception as e:
                 print(e)
                 #pass
+        self._baseH = self._imgs[0].get_size()[1]
+
+    def getImages(self):
+        return self._imgs
+
+    def getBaseH(self):
+        return self._baseH
+
+    def getNegativImages(self):
+        return self._negativImgs
 
     def createBaseMapSurface(self):
         self.baseMapSurface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
@@ -65,7 +77,7 @@ class DisplayManager:
         #     i += 1
         #     if i == 15:
         #         return
-        map.displayMap(self.screen, self.imgs, self._negativImgs)
+        map.displayMap(self.screen, self._baseH)
 
 
 

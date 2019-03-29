@@ -79,10 +79,13 @@ class GuiManager(object):
         # Check cases
         map = modules.gameManager.gameManager.getMap()
         case = map.getCaseAtPixel(pixel)
+
         # deselect previous cases
         if self._selectedCases is not None:
-            for case in self._selectedCases:
-                case.toggleSelected()
+            for c in self._selectedCases:
+                c.toggleSelected()
+
+        self._selectedCases = None
 
         if case is None:
             print("Le curseur n'est pas sur une case")
@@ -107,8 +110,8 @@ class GuiManager(object):
 
         # Select new cases
         if self._selectedCases is not None:
-            for case in self._selectedCases:
-                case.toggleSelected()
+            for c in self._selectedCases:
+                c.toggleSelected()
 
     def checkOnClick(self, value):
         if self._onGuiElement is not None:
