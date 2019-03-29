@@ -32,6 +32,8 @@ class GuiManager(object):
         # 5 layers by default
         self._maxLayer = 4
         self._layers = [{} for x in range(0, self._maxLayer + 1)]
+        self._highestLayerDisplayed = 0
+        self._lastHighest = 0
 
         self._selectedCases = None
 
@@ -103,6 +105,9 @@ class GuiManager(object):
         # tmp
         self._player.setCurrentMana(random.randint(0, 100))
 
+        if self._onGuiElement or self._highestLayerDisplayed > 0:
+            return
+
         # Check cases
         map = modules.gameManager.gameManager.getMap()
         case = map.getCaseAtPixel(pixel)
@@ -144,21 +149,35 @@ class GuiManager(object):
             self._onGuiElement.onClick(value)
 
     def updateMousePos(self, mousePos):
-        # small bug here showing new element without moving (Maybe force when new display)
-        if self._lastMousePos != mousePos:
+        if self._lastMousePos != mousePos or self._lastHighest != self._highestLayerDisplayed:
+
+            # small bug here showing new element without moving (Maybe force when new display)
+            # enough to fix it ? smth better ?
+            if self._lastHighest != self._highestLayerDisplayed and self._onGuiElement is not None:
+                self._onGuiElement.resetInside()
+
             self._lastMousePos = mousePos
             self._onGuiElement = None
+            self._lastHighest = self._highestLayerDisplayed
 
-            for l in range(self._maxLayer, -1, -1):
-                for guiElem in self._layers[l].values():
-                    self._onGuiElement = guiElem.checkInside(mousePos)
-                    if self._onGuiElement is not None:
-                        return
+            for guiElem in self._layers[self._highestLayerDisplayed].values():
+                self._onGuiElement = guiElem.checkInside(mousePos)
+                if self._onGuiElement is not None:
+                    return
+            # for l in range(self._maxLayer, -1, -1):
+            #     for guiElem in self._layers[l].values():
+            #         self._onGuiElement = guiElem.checkInside(mousePos)
+            #         if self._onGuiElement is not None:
+            #             return
 
     def updateGui(self):
+        highestLayer = 0
         for l in range(0, self._maxLayer + 1):
             for guiElem in self._layers[l].values():
-                guiElem.update()
+                if guiElem.getShow():
+                    guiElem.update()
+                    highestLayer = l if l > highestLayer else highestLayer
+        self._highestLayerDisplayed = highestLayer
 
     def displayGui(self, screen):
         for l in range(0, self._maxLayer + 1):

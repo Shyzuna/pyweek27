@@ -27,7 +27,7 @@ StatusPanelGUI = {
             'name': 'statusFrontElem',
             'elemType': GuiElement,
             'position': (0, 0.9),
-            'size': (0.2, 0.1),
+            'size': (0.3, 0.1),
             'windowBased': True,
             'children': [
                 {
@@ -171,7 +171,7 @@ StatusPanelGUI = {
                     'children': [
                         {
                             'elemType': BasicLabel,
-                            'text': 'Health Point',
+                            'text': 'HP',
                             'position': (0.05, 0.1),
                             'size': (0.9, 0.1)
                         },
@@ -195,7 +195,7 @@ StatusPanelGUI = {
                         },
                         {
                             'elemType': BasicLabel,
-                            'text': 'Mana Point',
+                            'text': 'Mana',
                             'position': (0.05, 0.3),
                             'size': (0.9, 0.1)
                         },
@@ -220,7 +220,7 @@ StatusPanelGUI = {
                         },
                         {
                             'elemType': BasicLabel,
-                            'text': 'Experience',
+                            'text': 'Exp',
                             'position': (0.05, 0.5),
                             'size': (0.9, 0.1)
                         },

@@ -69,6 +69,9 @@ class GuiElement(object):
     def getFlatPosition(self):
         return self._flatPosition
 
+    def getShow(self):
+        return self._show
+
     def getName(self):
         return self._name
 
@@ -209,8 +212,13 @@ class GuiElement(object):
                 self._insideElement = True
         if wasInside and wasInside != self._insideElement:
             # Layer system will make this buggy when dragging moose from top layer to down layer
+            # normally fixed by highest layer property
             self._clickIn = False
         return currentElem
+
+    def resetInside(self):
+        self._insideElement = False
+        self._clickIn = False
 
     def update(self):
         if not self._show:
